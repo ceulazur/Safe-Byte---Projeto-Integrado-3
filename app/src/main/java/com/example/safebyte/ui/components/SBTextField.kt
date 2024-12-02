@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
@@ -33,12 +34,12 @@ sealed class IconType {
 @Composable
 fun SBTextField(
     modifier: Modifier = Modifier,
+    value: String = "",
     placeholder: String = "",
-    icon: IconType,
-    onTextChange: (String) -> Unit
+    icon: IconType = IconType.ResourceIcon(0),
+    onTextChange: (String) -> Unit = {},
+    onFocusChange: (Boolean) -> Unit = {}
 ) {
-    val textFieldValue = remember { TextFieldValue() }
-
     Row(
         modifier = modifier
             .background(
@@ -50,12 +51,16 @@ fun SBTextField(
         verticalAlignment = Alignment.CenterVertically
     ) {
         BasicTextField(
-            value = textFieldValue,
-            onValueChange = { onTextChange(it.text) },
+            value = value,
+            onValueChange = { onTextChange(it) },
             singleLine = true,
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .onFocusChanged {
+                    onFocusChange(it.isFocused)
+                },
             decorationBox = { innerTextField ->
-                if (textFieldValue.text.isEmpty()) {
+                if (value.isEmpty()) {
                     Text(
                         text = placeholder,
                         fontSize = 16.sp,
@@ -75,6 +80,7 @@ fun SBTextField(
                 tint = Color.Gray,
                 modifier = Modifier.size(24.dp)
             )
+
             is IconType.ResourceIcon -> Icon(
                 painter = painterResource(id = icon.resourceId),
                 contentDescription = "Input Icon",
