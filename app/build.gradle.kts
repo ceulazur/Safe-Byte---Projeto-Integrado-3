@@ -40,6 +40,11 @@ android {
 }
 
 dependencies {
+    // to navigation
+    implementation(libs.androidx.navigation.compose)
+    implementation (libs.ui)
+    implementation (libs.androidx.material)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
