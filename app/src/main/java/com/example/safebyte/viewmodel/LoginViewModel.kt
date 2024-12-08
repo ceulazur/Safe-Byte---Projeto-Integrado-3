@@ -2,67 +2,90 @@ package com.example.safebyte.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.safebyte.viewmodel.validations.ValidateEmail
+import com.example.safebyte.viewmodel.validations.ValidatePassword
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 data class LoginUiState(
     val email: String = "",
     val password: String = "",
+
     val isLoading: Boolean = false,
     val isLoggedIn: Boolean = false,
-    val fieldErrors: Map<String, List<String>> = emptyMap(),
-    val touchedFields: Set<String> = emptySet()
+
+    val error: String? = null,
+
+    val emailError: String? = null,
+    val passwordError: String? = null
 )
 
-
-class LoginViewModel : ViewModel() {
+class LoginViewModel(
+    private val validateEmail: ValidateEmail = ValidateEmail(),
+    private val validatePassword: ValidatePassword = ValidatePassword()
+) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> get() = _uiState
 
+    private val validateEventChannel = Channel<ValidationEvent>()
+    val validateEvents = validateEventChannel.receiveAsFlow()
+
     fun updateEmail(email: String) {
         _uiState.value = _uiState.value.copy(email = email)
-        validateEmail(email)
     }
 
     fun updatePassword(password: String) {
         _uiState.value = _uiState.value.copy(password = password)
-        validatePassword(password)
     }
 
-    fun onFieldTouched(fieldName: String) {
-        _uiState.value = _uiState.value.copy(
-            touchedFields = _uiState.value.touchedFields + fieldName
-        )
+    private fun validateForm(): Boolean {
+        val emailResult = validateEmail.execute(_uiState.value.email)
+        val passwordResult = validatePassword.execute(_uiState.value.password)
+
+        val hasError = listOf(
+            emailResult,
+            passwordResult
+        ).any { !it.successful }
+
+        if (hasError) {
+            _uiState.value = _uiState.value.copy(
+                emailError = emailResult.errorMessage,
+                passwordError = passwordResult.errorMessage
+            )
+        }
+
+        return !hasError
     }
 
-    private fun validateEmail(email: String) {
-        val errors = mutableListOf<String>()
-        if (email.isEmpty()) {
-            errors.add("O email é obrigatório")
-        }
-        if (email.isNotEmpty() && !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            errors.add("Digite um email válido")
-        }
-        updateFieldErrors("email", errors)
-    }
+    fun login(onSuccess: () -> Unit) {
+        if(!validateForm()) return
 
-    private fun validatePassword(password: String) {
-        val errors = mutableListOf<String>()
-        if (password.isEmpty()) {
-            errors.add("A senha é obrigatória")
-        }
-        if (password.isNotEmpty() && password.length < 8) {
-            errors.add("A senha precisa ter no mínimo 8 caracteres")
-        }
-        updateFieldErrors("password", errors)
-    }
+        viewModelScope.launch {
+            try {
+                _uiState.value = _uiState.value.copy(isLoading = true)
+                // Simulate success
+                kotlinx.coroutines.delay(2000)
 
-    private fun updateFieldErrors(fieldName: String, errors: List<String>) {
-        _uiState.value = _uiState.value.copy(
-            fieldErrors = _uiState.value.fieldErrors.toMutableMap().apply {
-                put(fieldName, errors)
+                validateEventChannel.send(ValidationEvent.Success)
+
+                onSuccess()
+            } catch (e: Exception) {
+                if (e.message?.contains("400") == true) {
+                    validateEventChannel.send(ValidationEvent.Error("Email ou senha incorretos!"))
+                } else {
+                    validateEventChannel.send(ValidationEvent.Error("Não foi possível realizar login!"))
+                }
+            } finally {
+                _uiState.value = _uiState.value.copy(isLoading = false)
             }
-        )
+        }
+    }
+
+    sealed class ValidationEvent {
+        object Success: ValidationEvent()
+        data class Error(val message: String? = null): ValidationEvent()
     }
 }
