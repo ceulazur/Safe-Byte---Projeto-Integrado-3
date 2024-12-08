@@ -1,15 +1,14 @@
 package com.example.safebyte.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -17,13 +16,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,10 +35,34 @@ import com.example.safebyte.ui.components.SBButtonPrimary
 import com.example.safebyte.ui.components.SBPasswordField
 import com.example.safebyte.ui.components.SBTextField
 import com.example.safebyte.viewmodel.LoginViewModel
+
 @Composable
 fun LoginScreen(onLoginSuccess: () -> Unit = {}) {
     val viewModel = LoginViewModel()
     val uiState = viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = true) {
+        viewModel.validateEvents.collect { event ->
+            when (event) {
+                is LoginViewModel.ValidationEvent.Success -> {
+                    Toast.makeText(
+                        context,
+                        "Login realizado com sucesso",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                is LoginViewModel.ValidationEvent.Error -> {
+                    Toast.makeText(
+                        context,
+                        event.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
 
     Scaffold { paddingValues ->
         Box(
@@ -51,7 +77,6 @@ fun LoginScreen(onLoginSuccess: () -> Unit = {}) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Logo and title
                 Image(
                     painter = painterResource(id = R.drawable.logo),
                     contentDescription = "logo do Safe Byte",
@@ -60,81 +85,66 @@ fun LoginScreen(onLoginSuccess: () -> Unit = {}) {
                         .clip(RoundedCornerShape(16.dp))
                 )
                 Text(
-                    text = "Safe Byte",
+                    text = stringResource(R.string.safe_byte),
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
                 )
 
-                // Login form
                 Column(
                     modifier = Modifier
                         .padding(paddingValues)
-                        .padding(horizontal = 16.dp)
+                        .padding(16.dp, 0.dp)
                         .fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text("Bem vindo!")
+                    Text(stringResource(R.string.bem_vindo))
 
-                    // Email field with validation
                     SBTextField(
                         icon = IconType.ResourceIcon(R.drawable.fa_envelope),
-                        placeholder = "Email",
+                        placeholder = stringResource(R.string.email),
                         modifier = Modifier,
                         value = uiState.value.email,
                         onTextChange = {
                             viewModel.updateEmail(it)
-                        },
-                        onFocusChange = {
-                            if (it) viewModel.onFieldTouched("email")
                         }
                     )
-                    if (uiState.value.touchedFields.contains("email")) {
-                        uiState.value.fieldErrors["email"]?.forEach { error ->
-                            Text(
-                                text = error,
-                                color = Color.Red,
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        }
+
+                    if (uiState.value.emailError != null) {
+                        Text(
+                            text = uiState.value.emailError!!,
+                            color = Color.Red,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.align(Alignment.Start)
+                        )
                     }
 
-                    // Password field with validation
                     SBPasswordField(
                         placeholder = "Password",
                         value = uiState.value.password,
                         modifier = Modifier,
                         onTextChange = {
                             viewModel.updatePassword(it)
-                        },
-                        onFocusChange = {
-                            if (it) viewModel.onFieldTouched("password")
                         }
                     )
-                    if (uiState.value.touchedFields.contains("password")) {
-                        uiState.value.fieldErrors["password"]?.forEach { error ->
-                            Text(
-                                text = error,
-                                color = Color.Red,
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        }
+
+                    if (uiState.value.passwordError != null) {
+                        Text(
+                            text = uiState.value.passwordError!!,
+                            color = Color.Red,
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
 
-                    // Login button
                     SBButtonPrimary(
                         label = "Entrar",
                         onClick = {
-                            viewModel.validateEmail(uiState.value.email)
-                            viewModel.validatePassword(uiState.value.password)
-                            if (uiState.value.fieldErrors.values.all { it.isEmpty() }) {
-                                viewModel.login(onSuccess = onLoginSuccess)
-                            }
+                            viewModel.login(onSuccess = onLoginSuccess)
                         },
                         isLoading = uiState.value.isLoading
                     )
                 }
 
-                // Social login options
                 Text("Ou entre com")
+
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
@@ -160,20 +170,20 @@ fun LoginScreen(onLoginSuccess: () -> Unit = {}) {
                     )
                 }
 
-                // Sign-up suggestion
                 Row(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text("Primeira vez?")
+                    Text("Primeria vez?")
                     Text(
                         text = "Criar conta",
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
+                        fontWeight = FontWeight.Bold
                     )
+
                 }
             }
         }
+
     }
 }
 
