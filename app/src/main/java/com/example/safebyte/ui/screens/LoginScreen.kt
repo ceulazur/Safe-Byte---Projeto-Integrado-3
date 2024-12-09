@@ -69,7 +69,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit = {}) {
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .background(Color(0xFFEFF7FF)),
+                .background(MaterialTheme.colorScheme.background),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -111,7 +111,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit = {}) {
                     if (uiState.value.emailError != null) {
                         Text(
                             text = uiState.value.emailError!!,
-                            color = Color.Red,
+                            color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.align(Alignment.Start)
                         )
@@ -129,7 +129,7 @@ fun LoginScreen(onLoginSuccess: () -> Unit = {}) {
                     if (uiState.value.passwordError != null) {
                         Text(
                             text = uiState.value.passwordError!!,
-                            color = Color.Red,
+                            color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodySmall
                         )
                     }

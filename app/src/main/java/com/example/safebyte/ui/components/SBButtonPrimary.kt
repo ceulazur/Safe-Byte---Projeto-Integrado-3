@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.safebyte.ui.theme.SafeByteTheme
 
 @Composable
 fun SBButtonPrimary(
@@ -29,7 +31,7 @@ fun SBButtonPrimary(
         modifier = modifier
             .fillMaxWidth()
             .background(
-                color = Color(0xFFD1E5EC),
+                color = MaterialTheme.colorScheme.primary,
                 shape = RoundedCornerShape(16.dp)
             )
             .clickable(onClick = onClick)
@@ -38,7 +40,7 @@ fun SBButtonPrimary(
     ) {
         if (isLoading) {
             CircularProgressIndicator(
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.size(24.dp)
             )
         } else
@@ -54,5 +56,7 @@ fun SBButtonPrimary(
 @Preview
 @Composable
 fun SBButtonPrimaryPreview() {
-    SBButtonPrimary()
+    SafeByteTheme {
+        SBButtonPrimary()
+    }
 }
