@@ -12,6 +12,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -43,7 +44,7 @@ fun SBTextField(
     Row(
         modifier = modifier
             .background(
-                color = Color(0xFFF4F9FF),
+                color = MaterialTheme.colorScheme.surface,
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(horizontal = 16.dp, vertical = 12.dp)

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,7 +33,7 @@ fun SBPasswordField(
     Row(
         modifier = modifier
             .background(
-                color = Color(0xFFF4F9FF),
+                color = MaterialTheme.colorScheme.surface,
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(horizontal = 16.dp, vertical = 12.dp)
