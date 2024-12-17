@@ -1,4 +1,9 @@
 package com.example.safebyte.data.model
 
-class AllergyHistoryItem {
-}
+data class AllergyHistoryItem(
+    val id: String,
+    val allergen: String,
+    val severity: String,
+    val date: String,
+    val notes: String? = null
+)
