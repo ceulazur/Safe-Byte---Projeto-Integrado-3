@@ -5,20 +5,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,15 +25,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -44,10 +38,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.media3.common.MediaItem
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.ui.PlayerView
 import com.example.safebyte.R
 import com.example.safebyte.ui.theme.SafeByteTheme
 import java.text.SimpleDateFormat
@@ -68,38 +58,11 @@ data class LineParameters(
     val strokeWidth: Dp
 )
 
-@Composable
-fun VideoPlayer(
-    modifier: Modifier = Modifier,
-    videoUrl: String
-) {
-    val context = LocalContext.current
-
-    val exoPlayer = remember {
-        ExoPlayer.Builder(context).build().apply {
-            setMediaItem(MediaItem.fromUri(videoUrl))
-            prepare()
-            playWhenReady = false
-        }
-    }
-
-    DisposableEffect(exoPlayer) {
-        onDispose {
-            exoPlayer.release()
-        }
-    }
-
-    AndroidView(
-        factory = { context ->
-            PlayerView(context).apply {
-                player = exoPlayer
-            }
-        },
-        modifier = modifier
-            .fillMaxWidth()
-            .heightIn(min = 200.dp)
-    )
-}
+data class AllergyHistoryEntry(
+    val date: Date,
+    val videoUrl: String? = null,
+    val activitiesList: List<String>
+)
 
 @Composable
 fun TimelineNode(
@@ -111,6 +74,7 @@ fun TimelineNode(
     content: @Composable BoxScope.(modifier: Modifier) -> Unit
 ) {
     val circleColor: Color = MaterialTheme.colorScheme.secondary
+
     Box(
         modifier = Modifier
             .wrapContentSize()
@@ -146,12 +110,6 @@ fun dateToStringFormat(date: Date): String {
     return format.format(date)
 }
 
-data class MediaContent(
-    val date: Date,
-    val videoUrl: String?,
-    val activitiesList: List<String>
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SecondaryTopBar(
@@ -183,13 +141,52 @@ fun SecondaryTopBar(
 }
 
 @Composable
+fun SBTimeline(
+    allergyHistory: List<AllergyHistoryEntry>,
+    modifier: Modifier = Modifier
+) {
+    val listState = rememberLazyListState()
+
+    Scaffold(
+        topBar = {
+            SecondaryTopBar(
+                title = "Home",
+                onBackClick = {}
+            )
+        },
+        modifier = modifier
+    ) { paddingValues ->
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.padding(paddingValues)
+        ) {
+            items(
+                count = allergyHistory.size,
+                key = { allergyHistory[it] }
+            ) { mediaContent ->
+                TimelineNode(
+                    pos = TimelineNodePosition.FIRST,
+                    circleParameters = CircleParameters(6.dp),
+                    lineParameters = LineParameters(3.dp)
+                ) { modifier ->
+                    MessageBubble(
+                        mediaContent = allergyHistory[mediaContent],
+                        modifier
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun MessageBubble(
-    mediaContent: MediaContent,
+    mediaContent: AllergyHistoryEntry,
     modifier: Modifier
 ) {
     val date = Date()
 
-    Column (
+    Column(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight(),
@@ -253,28 +250,28 @@ fun MessageBubble(
 @Preview(showBackground = true)
 @Composable
 fun TimelineNodePreview() {
-    val listState = rememberLazyListState()
-    val itemsList = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-    val activitiesList = listOf(
-        "Activity 1",
-        "Activity 2",
-        "Activity 3",
-        "Activity 4",
-        "Activity 5",
-        "Activity 6",
-        "Activity 7",
-        "Activity 8",
-        "Activity 9",
-        "Activity 10",
-    )
-
-    val videoUrl =
-        "https://firebasestorage.googleapis.com/v0/b/aluno-d3928.appspot.com/o/profileImages%2F10240187-sd_360_640_30fps.mp4?alt=media&token=b956caff-2380-43df-9e9f-283b52219a6d"
-
-    val mediaContent = MediaContent(
-        date = Date(),
-        videoUrl = videoUrl,
-        activitiesList = activitiesList
+    val allergyHistory = listOf(
+        AllergyHistoryEntry(
+            date = Date(),
+            videoUrl = "https://firebasestorage.googleapis.com/v0/b/aluno-d3928.appspot.com/o/profileImages%2F10240187-sd_360_640_30fps.mp4?alt=media&token=b956caff-2380-43df-9e9f-283b52219a6d",
+            activitiesList = listOf(
+                "Activity 1",
+                "Activity 2",
+                "Activity 3",
+                "Activity 4",
+                "Activity 5",
+            )
+        ),
+        AllergyHistoryEntry(
+            date = Date(),
+            activitiesList = listOf(
+                "Activity 1",
+                "Activity 2",
+                "Activity 3",
+                "Activity 4",
+                "Activity 5"
+            )
+        )
     )
 
     SafeByteTheme(
@@ -288,31 +285,10 @@ fun TimelineNodePreview() {
                 )
             }
         ) { paddingValues ->
-
-            LazyColumn(
-                state = listState,
-                contentPadding = PaddingValues(horizontal = 8.dp),
+            SBTimeline(
+                allergyHistory = allergyHistory,
                 modifier = Modifier.padding(paddingValues)
-            ) {
-                items(
-                    count = itemsList.size,
-                    key = { itemsList[it] }
-                ) { _ ->
-                    TimelineNode(
-                        pos = TimelineNodePosition.FIRST,
-                        circleParameters = CircleParameters(6.dp),
-                        lineParameters = LineParameters(3.dp)
-                    ) { modifier ->
-                        MessageBubble(
-                            mediaContent = mediaContent,
-                            modifier
-                        )
-                    }
-                }
-
-            }
+            )
         }
-
-
     }
 }
