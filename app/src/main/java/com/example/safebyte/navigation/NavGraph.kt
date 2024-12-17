@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.safebyte.ui.screens.AllergyHistoryScreen
 import com.example.safebyte.ui.screens.HomeScreen
 import com.example.safebyte.ui.screens.LoginScreen
 
@@ -21,7 +22,14 @@ fun AppNavGraph(
             LoginScreen(onLoginSuccess = onLoginSuccess)
         }
         composable("home") {
-            HomeScreen()
+            HomeScreen(
+                navController = navController
+            )
+        }
+        composable("allergy_history") {
+            AllergyHistoryScreen(
+                navController = navController
+            )
         }
     }
 }
