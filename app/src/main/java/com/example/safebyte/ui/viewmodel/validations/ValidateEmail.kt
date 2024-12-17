@@ -1,4 +1,4 @@
-package com.example.safebyte.viewmodel.validations
+package com.example.safebyte.ui.viewmodel.validations
 
 import android.util.Patterns
 
