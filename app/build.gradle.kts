@@ -40,7 +40,9 @@ android {
 }
 
 dependencies {
-    implementation("androidx.compose.ui:ui-text-google-fonts:1.5.0")
+    // google fonts
+    implementation(libs.androidx.ui.text.google.fonts)
+    implementation(libs.androidx.runtime)
 
     // to navigation
     implementation(libs.androidx.navigation.compose)
