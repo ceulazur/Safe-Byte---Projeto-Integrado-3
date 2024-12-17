@@ -58,8 +58,9 @@ data class LineParameters(
     val strokeWidth: Dp
 )
 
-data class AllergyHistoryEntry(
-    val date: Date,
+data class TimelineEvent(
+    val id: Int = 0,
+    val date: Long,
     val videoUrl: String? = null,
     val activitiesList: List<String>
 )
@@ -105,7 +106,8 @@ fun TimelineNode(
     }
 }
 
-fun dateToStringFormat(date: Date): String {
+fun dateToStringFormat(datetime: Long): String {
+    val date = Date(datetime)
     val format = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
     return format.format(date)
 }
@@ -141,39 +143,29 @@ fun SecondaryTopBar(
 }
 
 @Composable
-fun SBTimeline(
-    allergyHistory: List<AllergyHistoryEntry>,
+fun Timeline(
+    timelineEventList: List<TimelineEvent>,
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
 
-    Scaffold(
-        topBar = {
-            SecondaryTopBar(
-                title = "Home",
-                onBackClick = {}
-            )
-        },
+    LazyColumn(
+        state = listState,
         modifier = modifier
-    ) { paddingValues ->
-        LazyColumn(
-            state = listState,
-            modifier = Modifier.padding(paddingValues)
-        ) {
-            items(
-                count = allergyHistory.size,
-                key = { allergyHistory[it] }
-            ) { mediaContent ->
-                TimelineNode(
-                    pos = TimelineNodePosition.FIRST,
-                    circleParameters = CircleParameters(6.dp),
-                    lineParameters = LineParameters(3.dp)
-                ) { modifier ->
-                    MessageBubble(
-                        mediaContent = allergyHistory[mediaContent],
-                        modifier
-                    )
-                }
+    ) {
+        items(
+            count = timelineEventList.size,
+            key = { timelineEventList[it].id }
+        ) { mediaContent ->
+            TimelineNode(
+                pos = TimelineNodePosition.FIRST,
+                circleParameters = CircleParameters(6.dp),
+                lineParameters = LineParameters(3.dp)
+            ) { modifier ->
+                MessageBubble(
+                    mediaContent = timelineEventList[mediaContent],
+                    modifier
+                )
             }
         }
     }
@@ -181,11 +173,9 @@ fun SBTimeline(
 
 @Composable
 fun MessageBubble(
-    mediaContent: AllergyHistoryEntry,
+    mediaContent: TimelineEvent,
     modifier: Modifier
 ) {
-    val date = Date()
-
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -194,8 +184,9 @@ fun MessageBubble(
     ) {
         Row {
             Text(
-                text = dateToStringFormat(date),
+                text = dateToStringFormat(datetime = mediaContent.date),
                 modifier = Modifier.padding(12.dp),
+                fontWeight = FontWeight.Medium
             )
         }
 
@@ -251,8 +242,8 @@ fun MessageBubble(
 @Composable
 fun TimelineNodePreview() {
     val allergyHistory = listOf(
-        AllergyHistoryEntry(
-            date = Date(),
+        TimelineEvent(
+            date = Date().time,
             videoUrl = "https://firebasestorage.googleapis.com/v0/b/aluno-d3928.appspot.com/o/profileImages%2F10240187-sd_360_640_30fps.mp4?alt=media&token=b956caff-2380-43df-9e9f-283b52219a6d",
             activitiesList = listOf(
                 "Activity 1",
@@ -260,16 +251,6 @@ fun TimelineNodePreview() {
                 "Activity 3",
                 "Activity 4",
                 "Activity 5",
-            )
-        ),
-        AllergyHistoryEntry(
-            date = Date(),
-            activitiesList = listOf(
-                "Activity 1",
-                "Activity 2",
-                "Activity 3",
-                "Activity 4",
-                "Activity 5"
             )
         )
     )
@@ -285,8 +266,15 @@ fun TimelineNodePreview() {
                 )
             }
         ) { paddingValues ->
-            SBTimeline(
-                allergyHistory = allergyHistory,
+            Column (
+                horizontalAlignment = Alignment.End
+            ){
+                SBButtonPrimary(
+                    label = "Adicionar eventos"
+                )
+            }
+            Timeline(
+                timelineEventList = allergyHistory,
                 modifier = Modifier.padding(paddingValues)
             )
         }
