@@ -1,5 +1,6 @@
-package com.example.safebyte.navigation
+package com.example.safebyte.ui.navigation
 
+import HomeScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -9,27 +10,38 @@ import com.example.safebyte.ui.screens.HomeScreen
 import com.example.safebyte.ui.screens.LoginScreen
 
 @Composable
-fun AppNavGraph(
-    navController: NavHostController,
-    isLoggedIn: Boolean,
-    onLoginSuccess: () -> Unit
-) {
+fun NavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = if (isLoggedIn) "home" else "login"
+        startDestination = "login" // Tela inicial
     ) {
+        // Tela de login
         composable("login") {
-            LoginScreen(onLoginSuccess = onLoginSuccess)
+            LoginScreen(onLoginSuccess = {
+                // Navegar para a HomeScreen após login bem-sucedido
+                navController.navigate("home") {
+                    popUpTo("login") { inclusive = true } // Remove a tela de login da pilha de navegação
+                }
+            })
         }
+
+        // Tela inicial (Home)
         composable("home") {
             HomeScreen(
-                navController = navController
+                userName = "Francisco", 
+                navController = navController, 
+                onButtonClick = { label ->
+                    when (label) {
+                        "Histórico alérgico" -> navController.navigate("allergy_history")
+                        else -> println("Botão clicado: $label")
+                    }
+                }
             )
         }
+
+        // Tela de histórico alérgico
         composable("allergy_history") {
-            AllergyHistoryScreen(
-                navController = navController
-            )
+            AllergyHistoryScreen(navController = navController)
         }
     }
 }
