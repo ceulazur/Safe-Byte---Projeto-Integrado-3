@@ -15,7 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
-import com.example.safebyte.navigation.AppNavGraph
+import com.example.safebyte.navigation.NavGraph
 import com.example.safebyte.ui.theme.SafeByteTheme
 import com.google.firebase.FirebaseApp
 
@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SafeByteTheme {
-                Surface (modifier = Modifier.fillMaxSize()) {
+                Surface(modifier = Modifier.fillMaxSize()) {
                     MainApp()
 //                    Greeting(
 //                        name = "Android",
@@ -44,34 +44,34 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
 
-@Composable
-fun MainApp() {
-    val navController = rememberNavController()
-    val isLoggedIn by remember { mutableStateOf(false) }
+    @Composable
+    fun MainApp() {
+        val navController = rememberNavController()
+        val isLoggedIn by remember { mutableStateOf(false) }
 
-    AppNavGraph(
-        navController = navController,
-        isLoggedIn = isLoggedIn,
-        onLoginSuccess = {
-            navController.navigate("home")
+        NavGraph(
+            navController = navController,
+            isLoggedIn = isLoggedIn,
+            onLoginSuccess = {
+                navController.navigate("home")
+            }
+        )
+    }
+
+    @Composable
+    fun Greeting(name: String, modifier: Modifier = Modifier) {
+        Text(
+            text = "Hello $name!",
+            modifier = modifier
+        )
+    }
+
+    @Preview(showBackground = true)
+    @Composable
+    fun GreetingPreview() {
+        SafeByteTheme {
+            Greeting("Android")
         }
-    )
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    SafeByteTheme {
-        Greeting("Android")
     }
 }
