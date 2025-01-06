@@ -3,7 +3,6 @@ package com.example.safebyte.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -25,7 +24,6 @@ import com.example.safebyte.ui.theme.SafeByteTheme
 fun SBButtonPrimary(
     label: String = "",
     onClick: () -> Unit = {},
-    leftIcon: @Composable (() -> Unit)? = null,
     modifier: Modifier = Modifier,
     isLoading: Boolean = false
 ) {
@@ -33,29 +31,25 @@ fun SBButtonPrimary(
         modifier = modifier
             .fillMaxWidth()
             .background(
-                color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(16.dp)
+                color = MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(16.dp)
             )
             .clickable(onClick = onClick)
-            .padding(16.dp), contentAlignment = Alignment.Center
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
     ) {
         if (isLoading) {
             CircularProgressIndicator(
-                color = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(24.dp)
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.size(24.dp)
             )
-        } else {
-            Row {
-                leftIcon?.let {
-                    leftIcon()
-                }
-
-                Text(
-                    text = label,
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center,
-                    color = Color.Black
-                )
-            }
-        }
+        } else
+            Text(
+                text = label,
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center,
+                color = Color.Black
+            )
     }
 }
 

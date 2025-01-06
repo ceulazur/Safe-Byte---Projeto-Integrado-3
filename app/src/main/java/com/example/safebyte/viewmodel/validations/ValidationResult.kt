@@ -1,4 +1,4 @@
-package com.example.safebyte.ui.viewmodel.validations
+package com.example.safebyte.viewmodel.validations
 
 class ValidationResult(
     val successful: Boolean,
