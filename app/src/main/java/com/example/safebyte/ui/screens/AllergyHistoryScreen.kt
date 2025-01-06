@@ -1,11 +1,14 @@
 package com.example.safebyte.ui.screens
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -41,6 +44,7 @@ import com.example.safebyte.ui.components.SecondaryTopBar
 import com.example.safebyte.ui.components.Timeline
 import com.example.safebyte.ui.components.TimelineEvent
 import com.example.safebyte.ui.viewmodel.AllergyHistoryViewModel
+import com.example.safebyte.ui.viewmodel.UploadState
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -66,6 +70,18 @@ fun AddNewRecordModal(
     val datePickerState = rememberDatePickerState()
     var selectedDate by remember {
         mutableStateOf("")
+    }
+
+    val uploadState by allergyHistoryViewModel.uploadState
+    val videoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let { selectedUri ->
+            run {
+                val context = navController.context
+                allergyHistoryViewModel.uploadVideo(selectedUri, context)
+            }
+        }
     }
 
     fun Long.toBrazilianDateFormat(
@@ -134,15 +150,58 @@ fun AddNewRecordModal(
                     }
                 }
 
-                Text("Link do vídeo:")
+//                Text("Link do vídeo:")
+//
+//                // Video URL Input
+//                SBTextField(
+//                    value = newRecordVideoUrl,
+//                    onTextChange = { newRecordVideoUrl = it },
+//                    placeholder = "Cole o link do vídeo",
+//                    modifier = Modifier.fillMaxWidth()
+//                )
 
-                // Video URL Input
-                SBTextField(
-                    value = newRecordVideoUrl,
-                    onTextChange = { newRecordVideoUrl = it },
-                    placeholder = "Cole o link do vídeo",
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Text("Vídeo:")
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = { videoPickerLauncher.launch("video/*") },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Selecionar Vídeo")
+                    }
+
+                    // Upload status
+                    when (uploadState) {
+                        is UploadState.Uploading -> {
+                            LinearProgressIndicator(
+                                progress = (uploadState as UploadState.Uploading).progress,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Text(
+                                text = "Enviando... ${((uploadState as UploadState.Uploading).progress * 100).toInt()}%",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                        is UploadState.Success -> {
+                            Text(
+                                text = "✓ Vídeo enviado com sucesso",
+                                color = MaterialTheme.colorScheme.primary,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                            newRecordVideoUrl = (uploadState as UploadState.Success).downloadUrl
+                        }
+                        is UploadState.Error -> {
+                            Text(
+                                text = "Erro ao enviar vídeo: ${(uploadState as UploadState.Error).message}",
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                        else -> { /* Initial state, nothing to show */ }
+                    }
+                }
 
                 // Activities Section
                 Text("Atividades:", style = MaterialTheme.typography.titleSmall)

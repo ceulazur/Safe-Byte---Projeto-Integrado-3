@@ -40,6 +40,16 @@ android {
 }
 
 dependencies {
+    // coil for async image
+    implementation(libs.coil.compose)
+
+    // firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics.ktx)
+
+    // firebase storage
+    implementation(libs.firebase.storage.ktx)
+
     // google fonts
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.runtime)

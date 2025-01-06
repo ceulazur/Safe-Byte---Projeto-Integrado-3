@@ -1,6 +1,7 @@
 package com.example.safebyte
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -16,10 +17,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.example.safebyte.navigation.AppNavGraph
 import com.example.safebyte.ui.theme.SafeByteTheme
+import com.google.firebase.FirebaseApp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+
+
         super.onCreate(savedInstanceState)
+        try {
+            FirebaseApp.initializeApp(this)
+            Log.d("SafeByteApplication", "Firebase initialized successfully")
+        } catch (e: Exception) {
+            Log.e("SafeByteApplication", "Error initializing Firebase: ${e.message}")
+        }
+
         enableEdgeToEdge()
         setContent {
             SafeByteTheme {
