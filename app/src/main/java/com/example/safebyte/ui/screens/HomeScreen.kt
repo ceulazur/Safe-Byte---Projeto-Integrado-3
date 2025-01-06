@@ -1,14 +1,23 @@
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.safebyte.R
+import com.example.safebyte.ui.components.SBButtonBox
+import com.example.safebyte.ui.components.SBButtonPrimary
+import com.example.safebyte.ui.components.SBHeader
+import com.example.safebyte.ui.components.SBNavBar
 
 @Composable
-fun HomeScreen(userName: String, onButtonClick: (String) -> Unit) {
+fun HomeScreen(
+    userName: String,
+    navController: NavHostController,
+    onButtonClick: (String) -> Unit
+) {
     Column(modifier = Modifier.fillMaxSize()) {
         // Cabeçalho
         SBHeader(userName = userName)
@@ -44,15 +53,21 @@ fun HomeScreen(userName: String, onButtonClick: (String) -> Unit) {
         Spacer(modifier = Modifier.weight(1f))
 
         // Barra de Navegação
-        val navController = rememberNavController()
         SBNavBar(navController = navController)
+
+        // Botão Adicional
+        SBButtonPrimary(
+            label = "Allergy History",
+            onClick = { navController.navigate("allergy_history") }
+        )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun PreviewHomeScreen() {
-    HomeScreen(userName = "Francisco") { label ->
+    val navController = rememberNavController()
+    HomeScreen(userName = "Francisco", navController = navController) { label ->
         println("Botão clicado: $label")
     }
 }

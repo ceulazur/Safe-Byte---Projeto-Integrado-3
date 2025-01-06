@@ -1,4 +1,4 @@
-package com.example.safebyte.viewmodel.validations
+package com.example.safebyte.ui.viewmodel.validations
 
 class ValidatePassword {
     fun execute(password: String): ValidationResult {

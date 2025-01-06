@@ -21,7 +21,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -34,7 +33,7 @@ import com.example.safebyte.ui.components.IconType
 import com.example.safebyte.ui.components.SBButtonPrimary
 import com.example.safebyte.ui.components.SBPasswordField
 import com.example.safebyte.ui.components.SBTextField
-import com.example.safebyte.viewmodel.LoginViewModel
+import com.example.safebyte.ui.viewmodel.LoginViewModel
 
 @Composable
 fun LoginScreen(onLoginSuccess: () -> Unit = {}) {
