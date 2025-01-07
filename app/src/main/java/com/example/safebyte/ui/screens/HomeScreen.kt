@@ -29,12 +29,11 @@ fun HomeScreen(
                 Pair(R.drawable.ic_info, "Minhas alergias"),
                 Pair(R.drawable.ic_qr_code, "Gerar QR-Code")
             ),
-            onButtonClick = {buttonLabel ->
-                if (buttonLabel == "Histórico alérgico") {
-                    navController.navigate("allergy_history")
-                }
-                else if (buttonLabel == "Minhas alergias") {
-                    navController.navigate("my_allergies")
+            onButtonClick = { buttonLabel ->
+                when (buttonLabel) {
+                    "Histórico alérgico" -> navController.navigate("allergy_history")
+                    "Minhas alergias" -> navController.navigate("my_allergies")
+                    else -> onButtonClick(buttonLabel)
                 }
             }
         )
@@ -49,14 +48,18 @@ fun HomeScreen(
                 Pair(R.drawable.ic_doctor, "Médico"),
                 Pair(R.drawable.ic_restaurant, "Restaurantes")
             ),
-            onButtonClick = onButtonClick
+            onButtonClick = { buttonLabel ->
+                when (buttonLabel) {
+                    "Médico" -> navController.navigate("doctor_search")
+                    else -> onButtonClick(buttonLabel)
+                }
+            }
         )
 
         Spacer(modifier = Modifier.weight(1f))
 
         // Barra de Navegação
         SBNavBar(navController = navController)
-
     }
 }
 
@@ -64,7 +67,10 @@ fun HomeScreen(
 @Composable
 fun PreviewHomeScreen() {
     val navController = rememberNavController()
-    HomeScreen(userName = "Francisco", navController = navController) { label ->
+    HomeScreen(
+        userName = "Francisco",
+        navController = navController
+    ) { label ->
         println("Botão clicado: $label")
     }
 }

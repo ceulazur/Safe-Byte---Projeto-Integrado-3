@@ -1,6 +1,5 @@
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -35,10 +34,12 @@ fun SBLocationSearch() {
             modifier = Modifier.fillMaxWidth()
         ) {
             locations.forEach { location ->
-                DropdownMenuItem(onClick = {
-                    searchText = location
-                    expanded = false
-                }) {
+                DropdownMenuItem(
+                    onClick = {
+                        searchText = location
+                        expanded = false
+                    }
+                ) {
                     Text(location)
                 }
             }
@@ -53,5 +54,3 @@ fun LocationSearchFieldPreview() {
         SBLocationSearch()
     }
 }
-
-
