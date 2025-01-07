@@ -1,9 +1,9 @@
-package com.example.safebyte.viewmodel
+package com.example.safebyte.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.safebyte.viewmodel.validations.ValidateEmail
-import com.example.safebyte.viewmodel.validations.ValidatePassword
+import com.example.safebyte.ui.viewmodel.validations.ValidateEmail
+import com.example.safebyte.ui.viewmodel.validations.ValidatePassword
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
