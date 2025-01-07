@@ -6,7 +6,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.safebyte.R
-import com.example.safebyte.ui.components.SBButtonPrimary
 
 @Composable
 fun HomeScreen(
@@ -30,7 +29,14 @@ fun HomeScreen(
                 Pair(R.drawable.ic_info, "Minhas alergias"),
                 Pair(R.drawable.ic_qr_code, "Gerar QR-Code")
             ),
-            onButtonClick = onButtonClick
+            onButtonClick = {buttonLabel ->
+                if (buttonLabel == "Histórico alérgico") {
+                    navController.navigate("allergy_history")
+                }
+                else if (buttonLabel == "Minhas alergias") {
+                    navController.navigate("my_allergies")
+                }
+            }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -51,11 +57,6 @@ fun HomeScreen(
         // Barra de Navegação
         SBNavBar(navController = navController)
 
-        // Botão Adicional
-        SBButtonPrimary(
-            label = "Allergy History",
-            onClick = { navController.navigate("allergy_history") }
-        )
     }
 }
 
