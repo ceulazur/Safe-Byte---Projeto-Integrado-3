@@ -16,8 +16,13 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.Image
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.state.ToggleableState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import com.example.safebyte.R
-import com.example.safebyte.ui.theme.SafeByteTheme
+
 
 data class Alergia(val nome: String)
 
@@ -62,12 +67,22 @@ fun ItemAlergia(
             modifier = Modifier.weight(1f)
         )
         Row {
-            // Botão Editar
+            // Botão Editar com feedback visual
+            val editInteractionSource = remember { MutableInteractionSource() }
+            val isEditPressed by editInteractionSource.collectIsPressedAsState()
+
             Box(
                 modifier = Modifier
                     .size(width = 40.dp, height = 36.dp)
-                    .background(Color(0xFFEFF7FF), shape = RoundedCornerShape(6.dp))
-                    .clickable(onClick = onEditClick),
+                    .background(
+                        if (isEditPressed) Color(0xFFB0D6F7) else Color(0xFFEFF7FF),
+                        shape = RoundedCornerShape(6.dp)
+                    )
+                    .clickable(
+                        onClick = onEditClick,
+                        interactionSource = editInteractionSource,
+                        indication = null
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
@@ -79,12 +94,23 @@ fun ItemAlergia(
                 )
             }
             Spacer(modifier = Modifier.width(8.dp))
-            // Botão Excluir
+
+            // Botão Excluir com feedback visual
+            val deleteInteractionSource = remember { MutableInteractionSource() }
+            val isDeletePressed by deleteInteractionSource.collectIsPressedAsState()
+
             Box(
                 modifier = Modifier
                     .size(width = 40.dp, height = 36.dp)
-                    .background(Color(0xFFFF7D61), shape = RoundedCornerShape(6.dp))
-                    .clickable(onClick = onDeleteClick),
+                    .background(
+                        if (isDeletePressed) Color(0xFFFFB3B3) else Color(0xFFFF7D61),
+                        shape = RoundedCornerShape(6.dp)
+                    )
+                    .clickable(
+                        onClick = onDeleteClick,
+                        interactionSource = deleteInteractionSource,
+                        indication = null
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 Image(

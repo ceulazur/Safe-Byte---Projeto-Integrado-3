@@ -1,5 +1,6 @@
 package com.example.safebyte.navigation
 
+import AllergyInfoScreen
 import HomeScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -33,6 +34,7 @@ fun NavGraph(
                     when (label) {
                         "Histórico alérgico" -> navController.navigate("allergy_history")
                         "Minhas alergias" -> navController.navigate("my_allergies")
+                        "Intolerância a lactose" -> navController.navigate("allergies_info")
                         else -> println("Botão clicado: $label")
                     }
                 }
@@ -47,6 +49,11 @@ fun NavGraph(
         // Tela de Minhas Alergias
         composable("my_allergies") {
             MyAllergiesScreen(navController = navController)
+        }
+
+        // Info Alergias
+        composable("allergies_info") {
+            AllergyInfoScreen(navController = navController)
         }
     }
 }
