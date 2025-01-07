@@ -15,12 +15,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 import com.example.safebyte.R
 
-// Data class to represent a doctor
-data class Doctor(
-    val name: String,
-    val location: String,
-    val rating: Double
-)
 
 @Composable
 fun SBDoctorList() {
