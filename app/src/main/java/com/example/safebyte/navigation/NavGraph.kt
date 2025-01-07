@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.safebyte.ui.screens.AllergyHistoryScreen
 import com.example.safebyte.ui.screens.LoginScreen
+import MyAllergiesScreen
 
 @Composable
 fun NavGraph(
@@ -31,6 +32,7 @@ fun NavGraph(
                 onButtonClick = { label ->
                     when (label) {
                         "Histórico alérgico" -> navController.navigate("allergy_history")
+                        "Minhas alergias" -> navController.navigate("my_allergies")
                         else -> println("Botão clicado: $label")
                     }
                 }
@@ -41,5 +43,11 @@ fun NavGraph(
         composable("allergy_history") {
             AllergyHistoryScreen(navController = navController)
         }
+
+        // Tela de Minhas Alergias
+        composable("my_allergies") {
+            MyAllergiesScreen(navController = navController)
+        }
     }
 }
+

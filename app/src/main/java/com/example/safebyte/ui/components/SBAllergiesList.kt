@@ -49,7 +49,7 @@ fun ItemAlergia(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFFE0E0E0), RoundedCornerShape(8.dp))
+            .background(Color(0xFFB3C8CF), RoundedCornerShape(8.dp))
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
