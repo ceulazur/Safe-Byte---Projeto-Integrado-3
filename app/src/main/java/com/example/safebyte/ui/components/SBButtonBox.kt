@@ -1,4 +1,5 @@
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -15,12 +16,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.safebyte.R
 import com.example.safebyte.ui.theme.Typography
 
+data class SBButtonBoxButtons (
+    val iconRes: Int,
+    val label: String,
+    val onClick: () -> Unit
+)
+
 @Composable
 fun SBButtonBox(
     title: String,
     description: String,
-    buttons: List<Pair<Int, String>>,
-    onButtonClick: (String) -> Unit
+    buttons: List<SBButtonBoxButtons>
 ) {
     Column(
         modifier = Modifier
@@ -73,10 +79,8 @@ fun SBButtonBox(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)
                 ) {
-                    rowButtons.forEach { (iconRes, label) ->
-                        SBButton(iconRes = iconRes, label = label) {
-                            onButtonClick(label)
-                        }
+                    rowButtons.forEach { (iconRes, label, action) ->
+                        SBButton(iconRes = iconRes, label = label, onClick = action)
                     }
                 }
             }
@@ -95,7 +99,8 @@ fun SBButtonBox(
         modifier = Modifier
             .size(120.dp, 100.dp)
             .background(color = backgroundColor, shape = RoundedCornerShape(16.dp))
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -127,12 +132,27 @@ fun PreviewFeatureSection() {
         title = "Principais serviços",
         description = "As principais funcionalidades do nosso app",
         buttons = listOf(
-            Pair(R.drawable.ic_qr_code, "Verificar produto"),
-            Pair(R.drawable.ic_history, "Histórico alérgico"),
-            Pair(R.drawable.ic_info, "Minhas alergias"),
-            Pair(R.drawable.ic_qr_code, "Gerar QR-Code")
+
+            SBButtonBoxButtons(
+                iconRes = R.drawable.ic_heart,
+                label = "Allergy History",
+                onClick = { /* Lógica do clique do botão 1 */ }
+            ),
+            SBButtonBoxButtons(
+                iconRes = R.drawable.ic_heart,
+                label = "Allergy History",
+                onClick = { /* Lógica do clique do botão 1 */ }
+            ),
+            SBButtonBoxButtons(
+                iconRes = R.drawable.ic_heart,
+                label = "Allergy History",
+                onClick = { /* Lógica do clique do botão 1 */ }
+            ),
+            SBButtonBoxButtons(
+                iconRes = R.drawable.ic_heart,
+                label = "Allergy History",
+                onClick = { /* Lógica do clique do botão 1 */ }
+            )
         )
-    ) { label ->
-        println("Botão clicado: $label")
-    }
+    )
 }

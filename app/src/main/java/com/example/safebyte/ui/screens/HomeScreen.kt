@@ -25,12 +25,33 @@ fun HomeScreen(
             title = "Principais serviços",
             description = "As principais funcionalidades do nosso app",
             buttons = listOf(
-                Pair(R.drawable.ic_qr_code, "Verificar produto"),
-                Pair(R.drawable.ic_history, "Histórico alérgico"),
-                Pair(R.drawable.ic_info, "Minhas alergias"),
-                Pair(R.drawable.ic_qr_code, "Gerar QR-Code")
-            ),
-            onButtonClick = onButtonClick
+                SBButtonBoxButtons(
+                    iconRes = R.drawable.ic_qr_code,
+                    label = "Verificar produto",
+                    onClick = {
+                        // Lógica para abrir a tela de verificar produto
+                    }
+                ),
+                SBButtonBoxButtons(
+                    iconRes = R.drawable.ic_history,
+                    label = "Histórico alérgico",
+                    onClick = { navController.navigate("allergy_history") }
+                ),
+                SBButtonBoxButtons(
+                    iconRes = R.drawable.ic_info,
+                    label = "Minhas alergias",
+                    onClick = {
+                        // Lógica para abrir a tela de minhas alergias
+                    }
+                ),
+                SBButtonBoxButtons(
+                    iconRes = R.drawable.ic_qr_code,
+                    label = "Gerar QR-Code",
+                    onClick = {
+                        // Lógica para abrir a tela de gerar QR-Code
+                    }
+                )
+            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -40,22 +61,27 @@ fun HomeScreen(
             title = "Comunidade recomenda",
             description = "As recomendações da nossa comunidade",
             buttons = listOf(
-                Pair(R.drawable.ic_doctor, "Médico"),
-                Pair(R.drawable.ic_restaurant, "Restaurantes")
-            ),
-            onButtonClick = onButtonClick
+                SBButtonBoxButtons(
+                    iconRes = R.drawable.ic_doctor,
+                    label = "Médico",
+                    onClick = {
+                        // Lógica para abrir a tela de médicos
+                    }
+                ),
+                SBButtonBoxButtons(
+                    iconRes = R.drawable.ic_restaurant,
+                    label = "Restaurante",
+                    onClick = {
+                        // Lógica para abrir a tela de restaurantes
+                    }
+                )
+            )
         )
 
         Spacer(modifier = Modifier.weight(1f))
 
         // Barra de Navegação
         SBNavBar(navController = navController)
-
-        // Botão Adicional
-        SBButtonPrimary(
-            label = "Allergy History",
-            onClick = { navController.navigate("allergy_history") }
-        )
     }
 }
 
