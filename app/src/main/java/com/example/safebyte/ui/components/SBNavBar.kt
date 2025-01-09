@@ -32,7 +32,7 @@ fun SBNavBar(navController: NavController) {
         listOf(
             BottomNavItem("Scanner", R.drawable.ic_qr_code, "scanner"),
             BottomNavItem("Home", R.drawable.ic_home, "home"),
-            BottomNavItem("Configurações", R.drawable.ic_settings, "settings")
+            BottomNavItem("Configurações", R.drawable.ic_settings, "my_allergies")
         )
     }
 

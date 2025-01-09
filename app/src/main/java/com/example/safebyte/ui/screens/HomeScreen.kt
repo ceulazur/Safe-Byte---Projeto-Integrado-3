@@ -6,7 +6,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.safebyte.R
-import com.example.safebyte.ui.components.SBButtonPrimary
 
 @Composable
 fun HomeScreen(
@@ -41,7 +40,7 @@ fun HomeScreen(
                     iconRes = R.drawable.ic_info,
                     label = "Minhas alergias",
                     onClick = {
-                        // Lógica para abrir a tela de minhas alergias
+//                        navController.navigate("my_allergies")
                     }
                 ),
                 SBButtonBoxButtons(
@@ -65,7 +64,7 @@ fun HomeScreen(
                     iconRes = R.drawable.ic_doctor,
                     label = "Médico",
                     onClick = {
-                        // Lógica para abrir a tela de médicos
+                        navController.navigate("doctor_search")
                     }
                 ),
                 SBButtonBoxButtons(
