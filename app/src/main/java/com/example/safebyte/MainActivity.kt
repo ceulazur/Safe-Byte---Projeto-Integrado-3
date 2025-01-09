@@ -36,10 +36,6 @@ class MainActivity : ComponentActivity() {
             SafeByteTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     MainApp()
-//                    Greeting(
-//                        name = "Android",
-//                        modifier = Modifier.padding(innerPadding)
-//                    )
                 }
             }
         }
