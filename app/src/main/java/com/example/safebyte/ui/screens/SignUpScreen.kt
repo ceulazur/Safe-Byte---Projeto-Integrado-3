@@ -35,29 +35,29 @@ import com.example.safebyte.ui.components.IconType
 import com.example.safebyte.ui.components.SBButtonPrimary
 import com.example.safebyte.ui.components.SBPasswordField
 import com.example.safebyte.ui.components.SBTextField
-import com.example.safebyte.ui.viewmodel.LoginViewModel
+import com.example.safebyte.ui.viewmodel.SignUpViewModel
 
 @Composable
-fun LoginScreen(
-    onLoginSuccess: () -> Unit = {},
-    navController: NavHostController,
+fun SignUpScreen(
+    navigateController: NavHostController,
+    onSignUpSuccess: () -> Unit = {},
 ) {
-    val viewModel = LoginViewModel()
+    val viewModel = SignUpViewModel()
     val uiState = viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
         viewModel.validateEvents.collect { event ->
             when (event) {
-                is LoginViewModel.ValidationEvent.Success -> {
+                is SignUpViewModel.ValidationEvent.Success -> {
                     Toast.makeText(
                         context,
-                        "Login realizado com sucesso",
+                        "Conta criada com sucesso",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
 
-                is LoginViewModel.ValidationEvent.Error -> {
+                is SignUpViewModel.ValidationEvent.Error -> {
                     Toast.makeText(
                         context,
                         event.message,
@@ -100,16 +100,31 @@ fun LoginScreen(
                         .fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text(stringResource(R.string.bem_vindo))
+                    Text("Criar nova conta")
+
+                    SBTextField(
+                        icon = IconType.ResourceIcon(R.drawable.ic_user),
+                        placeholder = "Nome completo",
+                        modifier = Modifier,
+                        value = uiState.value.fullName,
+                        onTextChange = { viewModel.updateFullName(it) }
+                    )
+
+                    if (uiState.value.fullNameError != null) {
+                        Text(
+                            text = uiState.value.fullNameError!!,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.align(Alignment.Start)
+                        )
+                    }
 
                     SBTextField(
                         icon = IconType.ResourceIcon(R.drawable.fa_envelope),
-                        placeholder = stringResource(R.string.email),
+                        placeholder = "Email",
                         modifier = Modifier,
                         value = uiState.value.email,
-                        onTextChange = {
-                            viewModel.updateEmail(it)
-                        }
+                        onTextChange = { viewModel.updateEmail(it) }
                     )
 
                     if (uiState.value.emailError != null) {
@@ -122,32 +137,45 @@ fun LoginScreen(
                     }
 
                     SBPasswordField(
-                        placeholder = "Password",
+                        placeholder = "Senha",
                         value = uiState.value.password,
                         modifier = Modifier,
-                        onTextChange = {
-                            viewModel.updatePassword(it)
-                        }
+                        onTextChange = { viewModel.updatePassword(it) }
                     )
 
                     if (uiState.value.passwordError != null) {
                         Text(
                             text = uiState.value.passwordError!!,
                             color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.align(Alignment.Start)
+                        )
+                    }
+
+                    SBPasswordField(
+                        placeholder = "Confirmar senha",
+                        value = uiState.value.confirmPassword,
+                        modifier = Modifier,
+                        onTextChange = { viewModel.updateConfirmPassword(it) }
+                    )
+
+                    if (uiState.value.confirmPasswordError != null) {
+                        Text(
+                            text = uiState.value.confirmPasswordError!!,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.align(Alignment.Start)
                         )
                     }
 
                     SBButtonPrimary(
-                        label = "Entrar",
-                        onClick = {
-                            viewModel.login(onSuccess = onLoginSuccess)
-                        },
+                        label = "Criar conta",
+                        onClick = { viewModel.signUp(onSignUpSuccess) },
                         isLoading = uiState.value.isLoading
                     )
                 }
 
-                Text("Ou entre com")
+                Text("Ou registre-se com")
 
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -178,33 +206,25 @@ fun LoginScreen(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text("Primeria vez?")
+                    Text("Já tem uma conta?")
                     Text(
-                        text = "Criar conta",
+                        text = "Entrar",
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.clickable {
-                            navController.navigate("sign_up")
+                            navigateController.navigate("login")
                         }
                     )
-
                 }
             }
         }
-
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun LoginScreenPreview() {
-    val navController = NavHostController(LocalContext.current)
-    LoginScreen(
-        onLoginSuccess = { navController.navigate("home") },
-        navController = navController
-    )
-
-    LoginScreen(
-        onLoginSuccess = { navController.navigate("home") },
-        navController = navController
+fun SignUpScreenPreview() {
+    val navigateController = NavHostController(LocalContext.current)
+    SignUpScreen(
+        navigateController
     )
 }

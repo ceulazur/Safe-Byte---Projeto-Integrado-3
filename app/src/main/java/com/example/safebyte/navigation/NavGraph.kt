@@ -3,19 +3,20 @@ package com.example.safebyte.navigation
 import AllergyInfoScreen
 import DoctorSearchScreen
 import HomeScreen
+import MyAllergiesScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.safebyte.ui.screens.AllergyHistoryScreen
 import com.example.safebyte.ui.screens.LoginScreen
-import MyAllergiesScreen
+import com.example.safebyte.ui.screens.SignUpScreen
 
 @Composable
 fun NavGraph(
     navController: NavHostController,
     isLoggedIn: Boolean,
-    onLoginSuccess: () -> Unit
+    onLoginSuccess: () -> Unit,
 ) {
     NavHost(
         navController = navController,
@@ -23,7 +24,10 @@ fun NavGraph(
     ) {
         // Tela de login
         composable("login") {
-            LoginScreen(onLoginSuccess = onLoginSuccess)
+            LoginScreen(
+                onLoginSuccess = onLoginSuccess,
+                navController = navController
+            )
         }
 
         // Tela inicial (Home)
@@ -58,8 +62,18 @@ fun NavGraph(
             AllergyInfoScreen(navController = navController)
         }
 
+        // Tela de sign up
+        composable("sign_up") {
+            SignUpScreen(
+                onSignUpSuccess = {
+                    navController.navigate("login")
+                },
+                navigateController = navController
+            )
+        }
+
         //Doctor Search
-        composable("doctor_search"){
+        composable("doctor_search") {
             DoctorSearchScreen(navController = navController)
         }
     }
