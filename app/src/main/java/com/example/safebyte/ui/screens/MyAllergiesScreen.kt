@@ -33,6 +33,18 @@ fun MyAllergiesScreen(navController: NavController) {
     }
 
     var showDialog by remember { mutableStateOf(false) }
+    var showEditDialog by remember { mutableStateOf(false) }
+    var selectedAlergia by remember { mutableStateOf<Alergia?>(null) }
+    var editingAlergia by remember { mutableStateOf<Alergia?>(null) }
+    var expanded by remember { mutableStateOf(false) }
+
+    val alergiasDisponiveis = listOf(
+        Alergia("Intolerância à lactose"),
+        Alergia("Intolerância ao glúten"),
+        Alergia("Intolerância à frutose"),
+        Alergia("Alergia ao amendoim"),
+        Alergia("Alergia ao ovo")
+    )
 
     Scaffold(
         topBar = {
@@ -88,7 +100,10 @@ fun MyAllergiesScreen(navController: NavController) {
                 // Lista de Alergias
                 ListaDeAlergias(
                     alergias = alergias,
-                    onEditClick = { /* Implementar edição */ },
+                    onEditClick = { alergia ->
+                        editingAlergia = alergia
+                        showEditDialog = true
+                    },
                     onDeleteClick = { alergia ->
                         alergias.remove(alergia)
                     },
@@ -102,6 +117,163 @@ fun MyAllergiesScreen(navController: NavController) {
 
                 // Barra de Navegação
                 SBNavBar(navController = navController)
+            }
+
+            // Modal de Adicionar Alergia
+            if (showDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    title = {
+                        Text(text = "Nova Alergia")
+                    },
+                    text = {
+                        Column {
+                            Text(text = "Selecione sua alergia:")
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color(0xFFF5F5F5), RoundedCornerShape(8.dp))
+                                    .clickable { expanded = true }
+                                    .padding(12.dp),
+                                contentAlignment = Alignment.CenterStart
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = selectedAlergia?.nome
+                                            ?: "Selecione sua alergia",
+                                        color = Color.Gray
+                                    )
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_dropdown),
+                                        contentDescription = "Dropdown Icon",
+                                        tint = Color.Gray
+                                    )
+                                }
+
+                                DropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false }
+                                ) {
+                                    alergiasDisponiveis.forEach { alergia ->
+                                        DropdownMenuItem(onClick = {
+                                            selectedAlergia = alergia
+                                            expanded = false
+                                        }) {
+                                            Text(text = alergia.nome)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        Button(
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFB3C8CF)),
+                            onClick = {
+                                selectedAlergia?.let { alergias.add(it) }
+                                showDialog = false
+                                selectedAlergia = null
+                            }
+                        ) {
+                            Text(text = "Confirmar", color = Color.Black)
+                        }
+                    },
+                    dismissButton = {
+                        Button(
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFEFF7FF)),
+                            onClick = {
+                                showDialog = false
+                                selectedAlergia = null
+                            }
+                        ) {
+                            Text(text = "Descartar", color = Color.Black)
+                        }
+                    },
+                    shape = RoundedCornerShape(16.dp) // Adicionando bordas arredondadas ao modal
+                )
+            }
+
+            // Modal de Editar Alergia
+            if (showEditDialog) {
+                AlertDialog(
+                    onDismissRequest = { showEditDialog = false },
+                    title = {
+                        Text(text = "Editar Alergia")
+                    },
+                    text = {
+                        Column {
+                            Text(text = "Selecione sua alergia:")
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color(0xFFF5F5F5), RoundedCornerShape(8.dp))
+                                    .clickable { expanded = true }
+                                    .padding(12.dp),
+                                contentAlignment = Alignment.CenterStart
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = editingAlergia?.nome
+                                            ?: "Selecione sua alergia",
+                                        color = Color.Gray
+                                    )
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_dropdown),
+                                        contentDescription = "Dropdown Icon",
+                                        tint = Color.Gray
+                                    )
+                                }
+
+                                DropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false }
+                                ) {
+                                    alergiasDisponiveis.forEach { alergia ->
+                                        DropdownMenuItem(onClick = {
+                                            editingAlergia = alergia
+                                            expanded = false
+                                        }) {
+                                            Text(text = alergia.nome)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        Button(
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF0F152B)),
+                            onClick = {
+                                editingAlergia?.let { updatedAlergia ->
+                                    val index = alergias.indexOfFirst { it == editingAlergia }
+                                    if (index != -1) {
+                                        alergias[index] = updatedAlergia
+                                    }
+                                }
+                                showEditDialog = false
+                                editingAlergia = null
+                            }
+                        ) {
+                            Text(text = "Confirmar", color = Color.White)
+                        }
+                    },
+                    dismissButton = {
+                        Button(
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFEFF7FF)),
+                            onClick = {
+                                showEditDialog = false
+                                editingAlergia = null
+                            }
+                        ) {
+                            Text(text = "Descartar", color = Color.Black)
+                        }
+                    },
+                    shape = RoundedCornerShape(16.dp) // Adicionando bordas arredondadas ao modal
+                )
             }
         }
     }
@@ -196,3 +368,4 @@ fun TelaAlergiasPreview() {
     val navController = rememberNavController()
     MyAllergiesScreen(navController = navController)
 }
+
