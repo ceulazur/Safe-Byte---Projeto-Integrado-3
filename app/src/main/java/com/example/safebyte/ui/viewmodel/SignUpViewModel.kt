@@ -134,7 +134,7 @@ class SignUpViewModel(
     }
 
     sealed class ValidationEvent {
-        object Success: ValidationEvent()
+        data object Success: ValidationEvent()
         data class Error(val message: String): ValidationEvent()
     }
 }
