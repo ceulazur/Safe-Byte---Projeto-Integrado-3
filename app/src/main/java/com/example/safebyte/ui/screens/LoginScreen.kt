@@ -3,6 +3,7 @@ package com.example.safebyte.ui.screens
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,7 +22,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -29,15 +29,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.safebyte.R
 import com.example.safebyte.ui.components.IconType
 import com.example.safebyte.ui.components.SBButtonPrimary
 import com.example.safebyte.ui.components.SBPasswordField
 import com.example.safebyte.ui.components.SBTextField
-import com.example.safebyte.viewmodel.LoginViewModel
+import com.example.safebyte.ui.viewmodel.LoginViewModel
 
 @Composable
-fun LoginScreen(onLoginSuccess: () -> Unit = {}) {
+fun LoginScreen(
+    onLoginSuccess: () -> Unit = {},
+    navController: NavHostController,
+) {
     val viewModel = LoginViewModel()
     val uiState = viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -177,7 +181,10 @@ fun LoginScreen(onLoginSuccess: () -> Unit = {}) {
                     Text("Primeria vez?")
                     Text(
                         text = "Criar conta",
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.clickable {
+                            navController.navigate("sign_up")
+                        }
                     )
 
                 }
@@ -190,5 +197,14 @@ fun LoginScreen(onLoginSuccess: () -> Unit = {}) {
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen()
+    val navController = NavHostController(LocalContext.current)
+    LoginScreen(
+        onLoginSuccess = { navController.navigate("home") },
+        navController = navController
+    )
+
+    LoginScreen(
+        onLoginSuccess = { navController.navigate("home") },
+        navController = navController
+    )
 }

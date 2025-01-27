@@ -1,4 +1,5 @@
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -32,7 +33,7 @@ fun SBButtonBox(
             )
             .padding(16.dp)
     ) {
-
+        // Cabeçalho com ícone e título
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -54,6 +55,7 @@ fun SBButtonBox(
         }
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Descrição
         Text(
             text = description,
             style = Typography.bodySmall.copy(
@@ -85,7 +87,7 @@ fun SBButtonBox(
 }
 
 @Composable
- fun SBButton(
+fun SBButton(
     iconRes: Int,
     label: String,
     backgroundColor: Color = Color(0xFFEFF7FF),
@@ -95,7 +97,8 @@ fun SBButtonBox(
         modifier = Modifier
             .size(120.dp, 100.dp)
             .background(color = backgroundColor, shape = RoundedCornerShape(16.dp))
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable(onClick = onClick), // Torna o botão clicável
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -133,6 +136,6 @@ fun PreviewFeatureSection() {
             Pair(R.drawable.ic_qr_code, "Gerar QR-Code")
         )
     ) { label ->
-        println("Botão clicado: $label")
+        println("Botão clicado: $label") // Exibe o rótulo do botão clicado no console
     }
 }
