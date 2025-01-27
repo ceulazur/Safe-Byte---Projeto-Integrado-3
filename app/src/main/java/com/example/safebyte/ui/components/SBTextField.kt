@@ -21,6 +21,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,7 +41,7 @@ fun SBTextField(
     isError: Boolean = false,
     errorMessage: String = "",
     onTextChange: (String) -> Unit = {},
-    onFocusChange: (Boolean) -> Unit = {}
+    onFocusChange: (Boolean) -> Unit = {},
 ) {
     Row(
         modifier = modifier
@@ -56,6 +57,10 @@ fun SBTextField(
         BasicTextField(
             value = value,
             onValueChange = { onTextChange(it) },
+            textStyle = TextStyle(
+                color = MaterialTheme.colorScheme.secondary,
+                fontSize = 16.sp,
+                ),
             singleLine = true,
             readOnly = readonly,
             modifier = Modifier
@@ -68,7 +73,7 @@ fun SBTextField(
                     Text(
                         text = placeholder,
                         fontSize = 16.sp,
-                        color = Color.Gray
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
                 innerTextField()

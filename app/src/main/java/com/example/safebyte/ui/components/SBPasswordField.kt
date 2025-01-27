@@ -45,6 +45,10 @@ fun SBPasswordField(
             onValueChange = { onTextChange(it) },
             singleLine = true,
             modifier = Modifier.weight(1f),
+            textStyle = androidx.compose.ui.text.TextStyle(
+                color = MaterialTheme.colorScheme.secondary,
+                fontSize = 16.sp
+            ),
             decorationBox = { innerTextField ->
                 if (value.isEmpty()) {
                     Text(

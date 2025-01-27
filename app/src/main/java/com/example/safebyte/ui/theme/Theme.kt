@@ -9,13 +9,15 @@ import androidx.compose.runtime.Composable
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
     secondary = PurpleGrey80,
-    tertiary = Pink80
+    tertiary = Pink80,
+    onSecondaryContainer = Blue800,
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Blue300,
     background = Blue50,
     secondary = Blue800,
+    onSecondaryContainer = Blue800,
     tertiary = Yellow100,
     error = Red300,
 
@@ -32,17 +34,10 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun SafeByteTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    darkTheme: Boolean,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-//        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-//            val context = LocalContext.current
-//            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-//        }
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }

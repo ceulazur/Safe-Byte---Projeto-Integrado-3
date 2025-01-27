@@ -1,5 +1,6 @@
 package com.example.safebyte
 
+import SettingsViewModel
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -9,11 +10,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.safebyte.navigation.NavGraph
 import com.example.safebyte.ui.theme.SafeByteTheme
@@ -31,8 +34,13 @@ class MainActivity : ComponentActivity() {
         }
 
         enableEdgeToEdge()
+
+
         setContent {
-            SafeByteTheme {
+            val settingsViewModel: SettingsViewModel = viewModel()
+            val isDarkTheme by settingsViewModel.isDarkTheme.collectAsState()
+
+            SafeByteTheme(darkTheme = isDarkTheme) {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     MainApp()
 //                    Greeting(
@@ -48,13 +56,15 @@ class MainActivity : ComponentActivity() {
     fun MainApp() {
         val navController = rememberNavController()
         val isLoggedIn by remember { mutableStateOf(false) }
+        val settingsViewModel: SettingsViewModel = viewModel ()
 
         NavGraph(
             navController = navController,
             isLoggedIn = isLoggedIn,
             onLoginSuccess = {
                 navController.navigate("home")
-            }
+            },
+            settingsViewModel = settingsViewModel
         )
     }
 
@@ -69,7 +79,10 @@ class MainActivity : ComponentActivity() {
     @Preview(showBackground = true)
     @Composable
     fun GreetingPreview() {
-        SafeByteTheme {
+
+        SafeByteTheme(
+            darkTheme = false
+        ) {
             Greeting("Android")
         }
     }

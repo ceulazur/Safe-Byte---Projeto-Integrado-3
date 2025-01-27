@@ -90,7 +90,8 @@ fun LoginScreen(
                 )
                 Text(
                     text = stringResource(R.string.safe_byte),
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.secondary
                 )
 
                 Column(

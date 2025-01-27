@@ -40,6 +40,10 @@ android {
 }
 
 dependencies {
+    // datastore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.datastore:datastore-preferences-core:1.0.0")
+
     // coil for async image
     implementation(libs.coil.compose)
 
