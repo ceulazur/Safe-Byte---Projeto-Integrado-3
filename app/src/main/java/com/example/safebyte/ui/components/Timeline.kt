@@ -202,10 +202,9 @@ fun MessageBubble(
                             .fillMaxWidth()
                             .wrapContentHeight()
                             .background(
-                                color = MaterialTheme.colorScheme.secondary,
+                                color = Color.Black,
                                 shape = RoundedCornerShape(16.dp)
                             )
-                            .padding(horizontal = 12.dp)
                             .padding(bottom = 12.dp)
                             .clip(MaterialTheme.shapes.medium)
                     ) {

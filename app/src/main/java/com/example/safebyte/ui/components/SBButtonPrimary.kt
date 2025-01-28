@@ -62,7 +62,9 @@ fun SBButtonPrimary(
 @Preview
 @Composable
 fun SBButtonPrimaryPreview() {
-    SafeByteTheme {
+    SafeByteTheme(
+        darkTheme = false
+    ) {
         SBButtonPrimary()
     }
 }
