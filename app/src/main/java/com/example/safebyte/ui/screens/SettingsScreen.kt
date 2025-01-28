@@ -1,5 +1,7 @@
 package com.example.safebyte.ui.screens
 
+import android.app.NotificationManager
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,25 +27,36 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.NotificationCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.safebyte.R
+import com.example.safebyte.ui.viewmodel.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    isDarkTheme: Boolean,
-    onThemeChanged: (Boolean) -> Unit,
+    viewModel: SettingsViewModel = viewModel(),
     onNavigateBack: () -> Unit,
     onNavigateMyAllergies: () -> Unit,
 ) {
-    var showThemeDialog by remember { mutableStateOf(false) }
+    val isDarkTheme by viewModel.isDarkTheme.collectAsState()
+    val isNotificationEnabled by viewModel.isNotificationEnabled.collectAsState()
+    val isAnimationsEnabled by viewModel.isAnimationsEnabled.collectAsState()
+
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.loadThemeState(context)
+        viewModel.loadNotificationState(context)
+    }
 
     Scaffold(
         topBar = {
@@ -71,16 +85,14 @@ fun SettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Theme Settings Section
+            // Seção de Tema
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
+                Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = "Aparência",
                         style = MaterialTheme.typography.titleMedium,
@@ -110,7 +122,7 @@ fun SettingsScreen(
                         }
                         Switch(
                             checked = isDarkTheme,
-                            onCheckedChange = onThemeChanged,
+                            onCheckedChange = { viewModel.toggleTheme(it, context) },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = MaterialTheme.colorScheme.primary,
                                 checkedTrackColor = MaterialTheme.colorScheme.background,
@@ -122,7 +134,103 @@ fun SettingsScreen(
                 }
             }
 
-            // Criar card para usuário ir para tela de my_allergies:
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Animações",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_star),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                            Text(
+                                text = "Ativar animações",
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+                        Switch(
+                            checked = isAnimationsEnabled,
+                            onCheckedChange = { viewModel.toggleAnimations(it) },
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = MaterialTheme.colorScheme.primary,
+                                checkedTrackColor = MaterialTheme.colorScheme.background,
+                                uncheckedThumbColor = MaterialTheme.colorScheme.secondary,
+                                uncheckedTrackColor = MaterialTheme.colorScheme.background
+                            )
+                        )
+                    }
+                }
+            }
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Notificações",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_profile),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                            Text(
+                                text = "Ativar notificações diárias",
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+                        Switch(
+                            checked = isNotificationEnabled,
+                            onCheckedChange = { viewModel.toggleNotifications(context, it) },
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = MaterialTheme.colorScheme.primary,
+                                checkedTrackColor = MaterialTheme.colorScheme.background,
+                                uncheckedThumbColor = MaterialTheme.colorScheme.secondary,
+                                uncheckedTrackColor = MaterialTheme.colorScheme.background
+                            )
+                        )
+                    }
+                }
+            }
+
+            // Seção de Alergias
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
@@ -130,9 +238,7 @@ fun SettingsScreen(
                 ),
                 onClick = onNavigateMyAllergies
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
+                Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = "Minhas alergias",
                         style = MaterialTheme.typography.titleMedium,
@@ -160,16 +266,40 @@ fun SettingsScreen(
                                 color = MaterialTheme.colorScheme.onSecondaryContainer
                             )
                         }
-
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = "Voltar",
+                            contentDescription = "Navegar",
                             tint = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     }
                 }
             }
 
+            TestNotificationButton()
         }
+    }
+}
+
+@Composable
+fun TestNotificationButton() {
+    val context = LocalContext.current
+
+    Button(
+        onClick = {
+            val notificationManager =
+                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val channelId = "daily_tips_channel"
+
+            val notification = NotificationCompat.Builder(context, channelId)
+                .setSmallIcon(R.drawable.fa_sun)
+                .setContentTitle("Teste de Notificação")
+                .setContentText("Esta é uma notificação de teste")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .build()
+
+            notificationManager.notify(999, notification)
+        }
+    ) {
+        Text("Testar Notificação")
     }
 }

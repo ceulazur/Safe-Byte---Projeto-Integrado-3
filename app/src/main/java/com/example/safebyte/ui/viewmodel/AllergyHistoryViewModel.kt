@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 
 sealed class UploadState {
-    object Initial : UploadState()
+    data object Initial : UploadState()
     data class Uploading(val progress: Float) : UploadState()
     data class Success(val downloadUrl: String) : UploadState()
     data class Error(val message: String) : UploadState()
