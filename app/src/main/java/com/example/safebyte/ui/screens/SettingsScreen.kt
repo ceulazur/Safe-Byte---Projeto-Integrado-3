@@ -51,12 +51,6 @@ fun SettingsScreen(
 
     val context = LocalContext.current
 
-
-    LaunchedEffect(Unit) {
-        viewModel.loadThemeState(context)
-        viewModel.loadNotificationState(context)
-        viewModel.loadAnimationState(context)
-    }
     Scaffold(
         topBar = {
             TopAppBar(

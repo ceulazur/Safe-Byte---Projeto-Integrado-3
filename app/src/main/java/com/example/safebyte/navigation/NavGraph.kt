@@ -16,6 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.safebyte.ui.screens.AllergyHistoryScreen
@@ -23,21 +24,21 @@ import com.example.safebyte.ui.screens.DoctorProfileScreen
 import com.example.safebyte.ui.screens.LoginScreen
 import com.example.safebyte.ui.screens.SettingsScreen
 import com.example.safebyte.ui.screens.SignUpScreen
+import com.example.safebyte.ui.viewmodel.AuthViewModel
 import com.example.safebyte.ui.viewmodel.SettingsViewModel
-import com.google.accompanist.navigation.animation.AnimatedNavHost
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun NavGraph(
     navController: NavHostController,
-    isLoggedIn: Boolean,
-    onLoginSuccess: () -> Unit,
+    authViewModel: AuthViewModel,
     settingsViewModel: SettingsViewModel,
 ) {
     val isAnimationsEnabled by settingsViewModel.isAnimationsEnabled.collectAsState()
     val context = navController.context
+    val isLoggedIn by authViewModel.isLoggedIn.collectAsState()
 
-    AnimatedNavHost(
+    NavHost(
         navController = navController,
         startDestination = if (isLoggedIn) "home" else "login",
         enterTransition = {
@@ -60,13 +61,21 @@ fun NavGraph(
         // Tela de login
         composable("login") {
             LoginScreen(
-                onLoginSuccess = onLoginSuccess,
+                authViewModel = authViewModel,
                 navController = navController
             )
         }
 
         // Tela inicial (Home)
         composable(route = "home") {
+            LaunchedEffect(Unit) {
+                settingsViewModel.loadThemeState(context)
+
+                settingsViewModel.loadNotificationState(context)
+
+                settingsViewModel.loadAnimationState(context)
+            }
+
             HomeScreen(
                 userName = "Francisco",
                 navController = navController,
@@ -111,8 +120,8 @@ fun NavGraph(
         composable("settings") {
             SettingsScreen(
                 viewModel = settingsViewModel,
-                onNavigateBack = { navController.navigate("home") }, // Navega de volta para a Home
-                onNavigateMyAllergies = { navController.navigate("my_allergies") } // Navega para Minhas Alergias
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateMyAllergies = { navController.navigate("my_allergies") }
             )
         }
 

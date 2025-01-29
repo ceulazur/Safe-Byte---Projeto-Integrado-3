@@ -17,8 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -32,6 +30,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
+
         try {
             FirebaseApp.initializeApp(this)
             Log.d("SafeByteApplication", "Firebase initialized successfully")
@@ -57,10 +56,7 @@ class MainActivity : ComponentActivity() {
     fun MainApp() {
         val context = LocalContext.current
         val navController = rememberNavController()
-        val isLoggedIn by remember { mutableStateOf(false) }
         val settingsViewModel: SettingsViewModel = viewModel();
-
-        FirebaseApp.initializeApp(this)
 
         // Verificação de permissão
         LaunchedEffect(Unit) {
@@ -79,11 +75,8 @@ class MainActivity : ComponentActivity() {
         createNotificationChannel()
 
         NavGraph(
+            authViewModel = viewModel(),
             navController = navController,
-            isLoggedIn = isLoggedIn,
-            onLoginSuccess = {
-                navController.navigate("home")
-            },
             settingsViewModel = settingsViewModel
         )
     }

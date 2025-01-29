@@ -35,11 +35,12 @@ import com.example.safebyte.ui.components.IconType
 import com.example.safebyte.ui.components.SBButtonPrimary
 import com.example.safebyte.ui.components.SBPasswordField
 import com.example.safebyte.ui.components.SBTextField
+import com.example.safebyte.ui.viewmodel.AuthViewModel
 import com.example.safebyte.ui.viewmodel.LoginViewModel
 
 @Composable
 fun LoginScreen(
-    onLoginSuccess: () -> Unit = {},
+    authViewModel: AuthViewModel,
     navController: NavHostController,
 ) {
     val viewModel = LoginViewModel()
@@ -142,7 +143,12 @@ fun LoginScreen(
                     SBButtonPrimary(
                         label = "Entrar",
                         onClick = {
-                            viewModel.login(onSuccess = onLoginSuccess)
+                            viewModel.login(onSuccess = {
+                                authViewModel.login()
+                                navController.navigate("home") {
+                                    popUpTo("login") { inclusive = true }
+                                }
+                            })
                         },
                         isLoading = uiState.value.isLoading
                     )
@@ -199,13 +205,14 @@ fun LoginScreen(
 @Composable
 fun LoginScreenPreview() {
     val navController = NavHostController(LocalContext.current)
+
     LoginScreen(
-        onLoginSuccess = { navController.navigate("home") },
+        authViewModel = AuthViewModel(),
         navController = navController
     )
 
     LoginScreen(
-        onLoginSuccess = { navController.navigate("home") },
+        authViewModel = AuthViewModel(),
         navController = navController
     )
 }

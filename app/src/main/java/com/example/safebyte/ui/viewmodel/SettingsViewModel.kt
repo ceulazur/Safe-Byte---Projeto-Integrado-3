@@ -57,32 +57,40 @@ class SettingsViewModel : ViewModel() {
 
     fun toggleNotifications(context: Context, enabled: Boolean) {
         viewModelScope.launch {
-            _isNotificationEnabled.value = enabled
+            try {
+                _isNotificationEnabled.value = enabled
 
-            context.dataStore.edit { preferences ->
-                preferences[NOTIFICATION_KEY] = enabled
-            }
+                // Salva no DataStore
+                context.dataStore.edit { preferences ->
+                    preferences[NOTIFICATION_KEY] = enabled
+                }
 
-            val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-            prefs.edit().putBoolean("notifications_enabled", enabled).apply()
-
-            if (enabled) {
-                scheduleNotification(context)
-            } else {
-                cancelNotification(context)
+                // Agenda ou cancela a notificação
+                if (enabled) {
+                    scheduleNotification(context)
+                } else {
+                    cancelNotification(context)
+                }
+            } catch (e: Exception) {
+                Log.e("SettingsViewModel", "Error saving notification preference", e)
             }
         }
     }
 
     fun loadNotificationState(context: Context) {
         viewModelScope.launch {
-            context.dataStore.data
-                .map { preferences ->
-                    preferences[NOTIFICATION_KEY] ?: false
-                }
-                .collect { enabled ->
-                    _isNotificationEnabled.value = enabled
-                }
+            try {
+                context.dataStore.data
+                    .map { preferences ->
+                        preferences[NOTIFICATION_KEY] ?: false
+                    }
+                    .collect { enabled ->
+                        _isNotificationEnabled.value = enabled
+                        Log.d("SettingsViewModel", "Notification preference loaded: $enabled")
+                    }
+            } catch (e: Exception) {
+                Log.e("SettingsViewModel", "Error loading notification preference", e)
+            }
         }
     }
 
@@ -107,11 +115,15 @@ class SettingsViewModel : ViewModel() {
 
             val calendar = Calendar.getInstance().apply {
                 timeInMillis = System.currentTimeMillis()
-                set(Calendar.HOUR_OF_DAY, 10)
-                set(Calendar.MINUTE, 0)
+
+                set(Calendar.HOUR_OF_DAY, 3)
+                set(Calendar.MINUTE, 32)
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
-                add(Calendar.HOUR_OF_DAY, 3)
+
+                if (timeInMillis <= System.currentTimeMillis()) {
+                    add(Calendar.DAY_OF_MONTH, 1)
+                }
             }
 
             Log.d("NotificationScheduler", "Scheduled time: ${calendar.time}")
@@ -132,7 +144,6 @@ class SettingsViewModel : ViewModel() {
                     )
 
                     val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     context.startActivity(intent)
                 }
@@ -143,11 +154,10 @@ class SettingsViewModel : ViewModel() {
                     pendingIntent
                 )
             } else {
-                Log.d("NotificationScheduler", "Using setRepeating for very old Android versions")
-                alarmManager.setRepeating(
+                Log.d("NotificationScheduler", "Using setExact for very old Android versions")
+                alarmManager.setExact(
                     AlarmManager.RTC_WAKEUP,
                     calendar.timeInMillis,
-                    AlarmManager.INTERVAL_DAY,
                     pendingIntent
                 )
             }
