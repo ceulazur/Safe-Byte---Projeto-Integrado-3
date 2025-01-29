@@ -58,7 +58,9 @@ class MainActivity : ComponentActivity() {
         val context = LocalContext.current
         val navController = rememberNavController()
         val isLoggedIn by remember { mutableStateOf(false) }
-        val settingsViewModel: SettingsViewModel = viewModel()
+        val settingsViewModel: SettingsViewModel = viewModel();
+
+        FirebaseApp.initializeApp(this)
 
         // Verificação de permissão
         LaunchedEffect(Unit) {
@@ -88,7 +90,6 @@ class MainActivity : ComponentActivity() {
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Log.d("NotificationChannel", "Creating notification channel")
 
             val channel = NotificationChannel(
                 "daily_tips_channel",

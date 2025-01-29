@@ -34,8 +34,25 @@ class SettingsViewModel : ViewModel() {
     private val _isAnimationsEnabled = MutableStateFlow(true)
     val isAnimationsEnabled: StateFlow<Boolean> = _isAnimationsEnabled
 
-    fun toggleAnimations(enabled: Boolean) {
+    fun toggleAnimations(context: Context, enabled: Boolean) {
         _isAnimationsEnabled.value = enabled
+        saveAnimationState(
+            context, enabled
+        )
+    }
+
+    fun loadAnimationState(context: Context) {
+        val sharedPref = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+        val animationsEnabled = sharedPref.getBoolean("animations_enabled", true)
+        _isAnimationsEnabled.value = animationsEnabled
+    }
+
+    private fun saveAnimationState(context: Context, enabled: Boolean) {
+        val sharedPref = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putBoolean("animations_enabled", enabled)
+            apply()
+        }
     }
 
     fun toggleNotifications(context: Context, enabled: Boolean) {
@@ -90,14 +107,10 @@ class SettingsViewModel : ViewModel() {
 
             val calendar = Calendar.getInstance().apply {
                 timeInMillis = System.currentTimeMillis()
-                set(Calendar.HOUR_OF_DAY, 19)
-                set(Calendar.MINUTE, 58)
+                set(Calendar.HOUR_OF_DAY, 10)
+                set(Calendar.MINUTE, 0)
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
-
-                if (timeInMillis <= System.currentTimeMillis()) {
-
-                }
                 add(Calendar.HOUR_OF_DAY, 3)
             }
 

@@ -76,7 +76,7 @@ fun SBNavBar(navController: NavController) {
                 },
                 alwaysShowLabel = true,
                 modifier = Modifier
-                    .padding(vertical = 10.dp) // Ajusta o espaço vertical para centralização
+                    .padding(vertical = 10.dp)
                     .align(Alignment.CenterVertically)
             )
         }

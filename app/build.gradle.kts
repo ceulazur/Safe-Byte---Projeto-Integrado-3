@@ -40,7 +40,10 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.accompanist.navigation.animation)
     implementation("androidx.work:work-runtime-ktx:2.8.1")
+    implementation(libs.google.accompanist.navigation.animation)
     // datastore
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation("androidx.datastore:datastore-preferences-core:1.0.0")

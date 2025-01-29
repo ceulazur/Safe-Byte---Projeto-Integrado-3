@@ -1,7 +1,5 @@
 package com.example.safebyte.ui.screens
 
-import android.app.NotificationManager
-import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,8 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,10 +30,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.core.app.NotificationCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.safebyte.R
 import com.example.safebyte.ui.viewmodel.SettingsViewModel
@@ -53,11 +51,12 @@ fun SettingsScreen(
 
     val context = LocalContext.current
 
+
     LaunchedEffect(Unit) {
         viewModel.loadThemeState(context)
         viewModel.loadNotificationState(context)
+        viewModel.loadAnimationState(context)
     }
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -170,7 +169,12 @@ fun SettingsScreen(
                         }
                         Switch(
                             checked = isAnimationsEnabled,
-                            onCheckedChange = { viewModel.toggleAnimations(it) },
+                            onCheckedChange = {
+                                viewModel.toggleAnimations(
+                                    context = context,
+                                    enabled = it
+                                )
+                            },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = MaterialTheme.colorScheme.primary,
                                 checkedTrackColor = MaterialTheme.colorScheme.background,
@@ -181,6 +185,7 @@ fun SettingsScreen(
                     }
                 }
             }
+
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -207,7 +212,7 @@ fun SettingsScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_profile),
+                                painter = rememberVectorPainter(image = Icons.Default.Notifications),
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSecondaryContainer
                             )
@@ -257,7 +262,7 @@ fun SettingsScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Icon(
-                                Icons.Default.Star,
+                                painter = rememberVectorPainter(image = Icons.Default.Person),
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSecondaryContainer
                             )
@@ -274,32 +279,6 @@ fun SettingsScreen(
                     }
                 }
             }
-
-            TestNotificationButton()
         }
-    }
-}
-
-@Composable
-fun TestNotificationButton() {
-    val context = LocalContext.current
-
-    Button(
-        onClick = {
-            val notificationManager =
-                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            val channelId = "daily_tips_channel"
-
-            val notification = NotificationCompat.Builder(context, channelId)
-                .setSmallIcon(R.drawable.fa_sun)
-                .setContentTitle("Teste de Notificação")
-                .setContentText("Esta é uma notificação de teste")
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .build()
-
-            notificationManager.notify(999, notification)
-        }
-    ) {
-        Text("Testar Notificação")
     }
 }

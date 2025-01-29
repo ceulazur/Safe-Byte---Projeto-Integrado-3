@@ -5,12 +5,17 @@ import Doctor
 import DoctorSearchScreen
 import HomeScreen
 import MyAllergiesScreen
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.safebyte.ui.screens.AllergyHistoryScreen
@@ -19,7 +24,9 @@ import com.example.safebyte.ui.screens.LoginScreen
 import com.example.safebyte.ui.screens.SettingsScreen
 import com.example.safebyte.ui.screens.SignUpScreen
 import com.example.safebyte.ui.viewmodel.SettingsViewModel
+import com.google.accompanist.navigation.animation.AnimatedNavHost
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun NavGraph(
     navController: NavHostController,
@@ -27,12 +34,28 @@ fun NavGraph(
     onLoginSuccess: () -> Unit,
     settingsViewModel: SettingsViewModel,
 ) {
-    val context = LocalContext.current
-    val isDarkTheme by settingsViewModel.isDarkTheme.collectAsState()
+    val isAnimationsEnabled by settingsViewModel.isAnimationsEnabled.collectAsState()
+    val context = navController.context
 
-    NavHost(
+    AnimatedNavHost(
         navController = navController,
-        startDestination = if (isLoggedIn) "home" else "login" // Tela inicial
+        startDestination = if (isLoggedIn) "home" else "login",
+        enterTransition = {
+            if (isAnimationsEnabled) {
+                fadeIn(animationSpec = tween(300))
+            } else {
+                EnterTransition.None
+            }
+        },
+        exitTransition = {
+            if (isAnimationsEnabled) {
+                fadeOut(
+                    animationSpec = tween(300)
+                )
+            } else {
+                ExitTransition.None
+            }
+        }
     ) {
         // Tela de login
         composable("login") {
@@ -43,7 +66,7 @@ fun NavGraph(
         }
 
         // Tela inicial (Home)
-        composable("home") {
+        composable(route = "home") {
             HomeScreen(
                 userName = "Francisco",
                 navController = navController,
