@@ -116,8 +116,8 @@ class SettingsViewModel : ViewModel() {
             val calendar = Calendar.getInstance().apply {
                 timeInMillis = System.currentTimeMillis()
 
-                set(Calendar.HOUR_OF_DAY, 13) // o tempo é 3 horas adiantado
-                set(Calendar.MINUTE, 0)
+                set(Calendar.HOUR_OF_DAY, 3) // o tempo é 3 horas adiantado
+                set(Calendar.MINUTE, 40)
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
 
@@ -143,9 +143,9 @@ class SettingsViewModel : ViewModel() {
                         "Cannot schedule exact alarms - permission not granted"
                     )
 
-                    val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    context.startActivity(intent)
+                    val alarmIntent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                    alarmIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    context.startActivity(alarmIntent)
                 }
             } else
                 Log.d("NotificationScheduler", "Using setAlarmClock for older Android versions")
