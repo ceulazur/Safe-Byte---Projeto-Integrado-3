@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
@@ -25,7 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -44,6 +45,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = viewModel(),
     onNavigateBack: () -> Unit,
     onNavigateMyAllergies: () -> Unit,
+    onNavigateFAQ: () -> Unit
 ) {
     val isDarkTheme by viewModel.isDarkTheme.collectAsState()
     val isNotificationEnabled by viewModel.isNotificationEnabled.collectAsState()
@@ -58,7 +60,7 @@ fun SettingsScreen(
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
-                            Icons.Default.ArrowBack,
+                            Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Voltar",
                             tint = MaterialTheme.colorScheme.onSecondaryContainer
                         )
@@ -262,6 +264,50 @@ fun SettingsScreen(
                             )
                             Text(
                                 text = "Minhas alergias",
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Navegar",
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                }
+            }
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                ),
+                onClick = onNavigateFAQ
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Perguntas Frequentes",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                painter = rememberVectorPainter(image = Icons.Default.Info),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                            Text(
+                                text = "Dúvidas frequentes",
                                 color = MaterialTheme.colorScheme.onSecondaryContainer
                             )
                         }
