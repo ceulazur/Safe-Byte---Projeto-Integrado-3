@@ -87,6 +87,12 @@ class SettingsViewModel : ViewModel() {
                     .collect { enabled ->
                         _isNotificationEnabled.value = enabled
                         Log.d("SettingsViewModel", "Notification preference loaded: $enabled")
+
+                        if (enabled) {
+                            scheduleNotification(context)
+                        } else {
+                            cancelNotification(context)
+                        }
                     }
             } catch (e: Exception) {
                 Log.e("SettingsViewModel", "Error loading notification preference", e)
@@ -117,7 +123,7 @@ class SettingsViewModel : ViewModel() {
                 timeInMillis = System.currentTimeMillis()
 
                 set(Calendar.HOUR_OF_DAY, 3) // o tempo é 3 horas adiantado
-                set(Calendar.MINUTE, 40)
+                set(Calendar.MINUTE, 53)
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
 
