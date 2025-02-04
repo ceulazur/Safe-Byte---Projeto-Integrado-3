@@ -14,7 +14,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.safebyte.utils.NotificationReceiver
+import com.example.safebyte.receiver.NotificationReceiver
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -116,8 +116,8 @@ class SettingsViewModel : ViewModel() {
             val calendar = Calendar.getInstance().apply {
                 timeInMillis = System.currentTimeMillis()
 
-                set(Calendar.HOUR_OF_DAY, 3)
-                set(Calendar.MINUTE, 32)
+                set(Calendar.HOUR_OF_DAY, 13) // o tempo é 3 horas adiantado
+                set(Calendar.MINUTE, 0)
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
 
@@ -147,20 +147,12 @@ class SettingsViewModel : ViewModel() {
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     context.startActivity(intent)
                 }
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            } else
                 Log.d("NotificationScheduler", "Using setAlarmClock for older Android versions")
                 alarmManager.setAlarmClock(
                     AlarmManager.AlarmClockInfo(calendar.timeInMillis, pendingIntent),
                     pendingIntent
                 )
-            } else {
-                Log.d("NotificationScheduler", "Using setExact for very old Android versions")
-                alarmManager.setExact(
-                    AlarmManager.RTC_WAKEUP,
-                    calendar.timeInMillis,
-                    pendingIntent
-                )
-            }
 
             Log.d("NotificationScheduler", "Notification scheduled successfully")
         } catch (e: Exception) {

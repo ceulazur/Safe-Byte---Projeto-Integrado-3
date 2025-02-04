@@ -1,4 +1,4 @@
-package com.example.safebyte.utils
+package com.example.safebyte.receiver
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -24,11 +24,9 @@ class NotificationReceiver : BroadcastReceiver() {
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
             // Verificar se as notificações estão habilitadas
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                if (!notificationManager.areNotificationsEnabled()) {
-                    Log.e("NotificationReceiver", "Notifications are disabled for the app")
-                    return
-                }
+            if (!notificationManager.areNotificationsEnabled()) {
+                Log.e("NotificationReceiver", "Notifications are disabled for the app")
+                return
             }
 
             val hasNewTips = checkForNewTips(context)
@@ -36,7 +34,7 @@ class NotificationReceiver : BroadcastReceiver() {
 
             val title = if (hasNewTips) "Nova Dica de Segurança!" else "Bom Dia!"
             val message =
-                if (hasNewTips) getLatestTip(context) else "Lembre-se de verificar locais seguros hoje!"
+                if (hasNewTips) getLatestTip() else "Lembre-se de verificar locais seguros hoje!"
 
             showNotification(context, title, message)
 
@@ -59,7 +57,7 @@ class NotificationReceiver : BroadcastReceiver() {
         return hasNew
     }
 
-    private fun getLatestTip(context: Context): String {
+    private fun getLatestTip(): String {
         // Implemente a busca real no banco de dados aqui
         return "Sempre verifique os ingredientes com o estabelecimento antes de consumir."
     }
@@ -73,22 +71,20 @@ class NotificationReceiver : BroadcastReceiver() {
             val channelId = "daily_tips_channel"
 
             // Criar ou atualizar o canal de notificação
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = notificationManager.getNotificationChannel(channelId)
-                if (channel == null) {
-                    Log.d("NotificationReceiver", "Creating notification channel")
-                    val newChannel = NotificationChannel(
-                        channelId,
-                        "Dicas Diárias",
-                        NotificationManager.IMPORTANCE_HIGH
-                    ).apply {
-                        description = "Notificações com dicas de segurança para alérgicos"
-                        enableLights(true)
-                        lightColor = Color.RED
-                        enableVibration(true)
-                    }
-                    notificationManager.createNotificationChannel(newChannel)
+            val channel = notificationManager.getNotificationChannel(channelId)
+            if (channel == null) {
+                Log.d("NotificationReceiver", "Creating notification channel")
+                val newChannel = NotificationChannel(
+                    channelId,
+                    "Dicas Diárias",
+                    NotificationManager.IMPORTANCE_HIGH
+                ).apply {
+                    description = "Notificações com dicas de segurança para alérgicos"
+                    enableLights(true)
+                    lightColor = Color.RED
+                    enableVibration(true)
                 }
+                notificationManager.createNotificationChannel(newChannel)
             }
 
             val notification = NotificationCompat.Builder(context, channelId)
