@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1072159158094",
+    "project_id": "aluno-d3928",
+    "storage_bucket": "aluno-d3928.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1072159158094:android:67a977893b097994c0f81f",
+        "android_client_info": {
+          "package_name": "com.example.safebyte"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtw3rMSD5vZo9sWgykjjEHWG0VC_ObiV0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

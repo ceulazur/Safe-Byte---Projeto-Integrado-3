@@ -36,6 +36,8 @@ fun SBNavBar(navController: NavController) {
         )
     }
 
+    val currentRoute = navController.currentDestination?.route
+
     BottomNavigation(
         backgroundColor = Color(0xFFB3C8CF),
         contentColor = Color(0xFF0F152B),
@@ -44,8 +46,6 @@ fun SBNavBar(navController: NavController) {
             .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
             .height(80.dp)
     ) {
-        val currentRoute = navController.currentDestination?.route
-
         items.forEach { item ->
             BottomNavigationItem(
                 selected = currentRoute == item.route,
@@ -76,7 +76,7 @@ fun SBNavBar(navController: NavController) {
                 },
                 alwaysShowLabel = true,
                 modifier = Modifier
-                    .padding(vertical = 10.dp) // Ajusta o espaço vertical para centralização
+                    .padding(vertical = 10.dp)
                     .align(Alignment.CenterVertically)
             )
         }
