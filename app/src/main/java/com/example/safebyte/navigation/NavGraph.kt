@@ -21,6 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.safebyte.ui.screens.AllergyHistoryScreen
 import com.example.safebyte.ui.screens.DoctorProfileScreen
+import com.example.safebyte.ui.screens.FAQScreen
 import com.example.safebyte.ui.screens.LoginScreen
 import com.example.safebyte.ui.screens.SettingsScreen
 import com.example.safebyte.ui.screens.SignUpScreen
@@ -101,6 +102,10 @@ fun NavGraph(
             MyAllergiesScreen(navController = navController)
         }
 
+        composable("faq") {
+            FAQScreen(onNavigateBack = { navController.popBackStack() })
+        }
+
         // Info Alergias
         composable("allergies_info") {
             AllergyInfoScreen(navController = navController)
@@ -121,7 +126,8 @@ fun NavGraph(
             SettingsScreen(
                 viewModel = settingsViewModel,
                 onNavigateBack = { navController.popBackStack() },
-                onNavigateMyAllergies = { navController.navigate("my_allergies") }
+                onNavigateMyAllergies = { navController.navigate("my_allergies") },
+                onNavigateFAQ = { navController.navigate("faq") }
             )
         }
 
