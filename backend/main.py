@@ -4,6 +4,7 @@ from routes import user, userallergies
 from routes import tips
 from routes import allergysymptoms, symptoms, allergies
 from routes import doctorknowallergies, doctor, doctorreview
+from routes import  productreview, productallergies, products
 app = FastAPI()
 
 # Initialize supabase client
@@ -23,3 +24,7 @@ app.include_router(symptoms.router)
 app.include_router(doctorreview.router)
 app.include_router(doctorknowallergies.router)
 app.include_router(doctor.router)
+#produtos
+app.include_router(products.router)
+app.include_router(productreview.router)
+app.include_router(productallergies.router)
