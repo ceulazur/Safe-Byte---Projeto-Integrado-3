@@ -13,7 +13,12 @@ supabase = create_supabase_client()
 #users
 app.include_router(user.router)
 app.include_router(userallergies.router)
+#tips
+app.include_router(tips.router)
+#produtos
+app.include_router(products.router)
+app.include_router(productreview.router)
+app.include_router(productallergies.router)
 #alergias
 app.include_router(allergies.router)
 app.include_router(allergysymptoms.router)
-
