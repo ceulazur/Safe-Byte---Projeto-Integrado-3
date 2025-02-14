@@ -27,3 +27,10 @@ app.include_router(allergysymptoms.router)
 app.include_router(establishmentreview.router)
 app.include_router(establishmentallergies.router)
 app.include_router(establishment.router)
+#medicos
+app.include_router(doctorreview.router)
+app.include_router(doctorknowallergies.router)
+app.include_router(doctor.router)
+#simtomas
+app.include_router(symptoms.router)
+
