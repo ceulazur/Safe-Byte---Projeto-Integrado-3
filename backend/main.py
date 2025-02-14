@@ -3,6 +3,7 @@ from database import create_supabase_client
 from routes import user, userallergies
 from routes import tips
 from routes import allergysymptoms, symptoms, allergies
+from routes import doctorknowallergies, doctor, doctorreview
 app = FastAPI()
 
 # Initialize supabase client
@@ -18,3 +19,7 @@ app.include_router(allergies.router)
 app.include_router(allergysymptoms.router)
 #simtomas
 app.include_router(symptoms.router)
+#medicos
+app.include_router(doctorreview.router)
+app.include_router(doctorknowallergies.router)
+app.include_router(doctor.router)
