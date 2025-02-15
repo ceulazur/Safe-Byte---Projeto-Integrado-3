@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
     fun MainApp() {
         val context = LocalContext.current
         val navController = rememberNavController()
-        val settingsViewModel: SettingsViewModel = viewModel();
+        val settingsViewModel: SettingsViewModel = viewModel()
 
         // Verificação de permissão
         LaunchedEffect(Unit) {
@@ -79,24 +79,22 @@ class MainActivity : ComponentActivity() {
             navController = navController,
             settingsViewModel = settingsViewModel
         )
+
     }
 
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
-            val channel = NotificationChannel(
-                "daily_tips_channel",
-                "Dicas Diárias",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Notificações com dicas de segurança para alérgicos"
-                enableLights(true)
-                lightColor = android.graphics.Color.RED
-                enableVibration(true)
-            }
-
-            val notificationManager = getSystemService(NotificationManager::class.java)
-            notificationManager.createNotificationChannel(channel)
+        val channel = NotificationChannel(
+            "daily_tips_channel",
+            "Dicas Diárias",
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Notificações com dicas de segurança para alérgicos"
+            enableLights(true)
+            lightColor = android.graphics.Color.RED
+            enableVibration(true)
         }
+
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager.createNotificationChannel(channel)
     }
 }

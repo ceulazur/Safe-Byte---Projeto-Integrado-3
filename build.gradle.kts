@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.fir.declarations.builder.buildScript
-
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     alias(libs.plugins.android.application) apply false
@@ -13,8 +11,10 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        maven { url = uri("https://jitpack.io") }
     }
     dependencies {
-        classpath("com.google.gms:google-services:4.3.10")
+        classpath(libs.google.services.v4310)
+        classpath(libs.kotlin.serialization)
     }
 }

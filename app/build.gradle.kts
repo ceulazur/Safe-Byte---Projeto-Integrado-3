@@ -1,8 +1,11 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -17,37 +20,80 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Set value part
+        val properties = Properties()
+        properties.load(project.rootProject.file("local.properties").inputStream())
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"${properties.getProperty("SUPABASE_ANON_KEY")}\"")
+        buildConfigField("String", "SECRET", "\"${properties.getProperty("SECRET")}\"")
+        buildConfigField("String", "SUPABASE_URL", "\"${properties.getProperty("SUPABASE_URL")}\"")
     }
 
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
+//    buildTypes {
+//        val localProperties = Properties()
+//        val localPropertiesFile = rootProject.file("local.properties")
+//        if (localPropertiesFile.exists()) {
+//            localProperties.load(localPropertiesFile.inputStream())
+//        }
+//
+//        debug {
+//            val supabaseUrl = localProperties.getProperty("SUPABASE_URL", "")
+//            val supabaseKey = localProperties.getProperty("SUPABASE_KEY", "")
+//
+//            buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
+//            buildConfigField("String", "SUPABASE_KEY", "\"$supabaseKey\"")
+//        }
+//
+//        release {
+//            val supabaseUrl: String? = System.getenv("SUPABASE_URL")
+//            val supabaseKey: String? = System.getenv("SUPABASE_KEY")
+//
+//            buildConfigField("String", "SUPABASE_URL", "\"${supabaseUrl ?: ""}\"")
+//            buildConfigField("String", "SUPABASE_KEY", "\"${supabaseKey ?: ""}\"")
+//        }
+//    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
 dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.accompanist.navigation.animation)
-    implementation("androidx.work:work-runtime-ktx:2.8.1")
+    implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.google.accompanist.navigation.animation)
+
     // datastore
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
-    implementation("androidx.datastore:datastore-preferences-core:1.0.0")
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.preferences.core)
+    implementation(libs.play.services.auth)
+
+    // Supabase
+    implementation (libs.postgrest.kt.v311)
+    implementation (libs.storage.kt)
+    implementation (libs.auth.kt)
+
+    // Ktor
+    implementation (libs.ktor.client.android)
+    implementation (libs.ktor.client.core)
+    implementation (libs.ktor.utils)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.plugins)
+
+
+    // Kotlin Serialization
+    implementation(libs.kotlinx.serialization.json)
 
     // coil for async image
     implementation(libs.coil.compose)
@@ -79,17 +125,8 @@ dependencies {
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
     implementation(libs.androidx.foundation.layout.android)
-    implementation(libs.androidx.foundation.layout.android)
-    implementation(libs.androidx.foundation.layout.android)
-    implementation(libs.androidx.foundation.layout.android)
-    implementation(libs.androidx.foundation.layout.android)
-    implementation(libs.androidx.foundation.layout.android)
-    implementation(libs.androidx.foundation.layout.android)
-    implementation(libs.androidx.foundation.layout.android)
-    implementation(libs.androidx.foundation.layout.android)
-    implementation(libs.androidx.foundation.layout.android)
-    implementation(libs.androidx.foundation.layout.android)
     implementation(libs.firebase.vertexai)
+    implementation(libs.androidx.espresso.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

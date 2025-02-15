@@ -9,56 +9,40 @@ import android.graphics.Color
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.safebyte.R
-import com.example.safebyte.ui.viewmodel.SettingsViewModel
-import java.util.Date
+import com.example.safebyte.data.repository.TipRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class NotificationReceiver : BroadcastReceiver() {
+
     override fun onReceive(context: Context, intent: Intent?) {
         Log.d("NotificationReceiver", "onReceive called")
-        Log.d("NotificationReceiver", "Intent action: ${intent?.action}")
-        Log.d("NotificationReceiver", "Current time: ${Date()}")
 
-        try {
-            val notificationManager =
-                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (intent?.action == "DAILY_NOTIFICATION") {
+            val tipRepository = TipRepository()
 
-            // Verificar se as notificações estão habilitadas
-            if (!notificationManager.areNotificationsEnabled()) {
-                Log.e("NotificationReceiver", "Notifications are disabled for the app")
-                return
+            // Usando coroutine para chamada assíncrona
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+                    val lastTip = tipRepository.getLastTip()
+
+                    Log.d("NotificationDebug", "Result: $lastTip") // Log do resultado
+
+                    lastTip.onSuccess { tip ->
+                        val message = tip?.message ?: "Mensagem padrão"
+                        Log.d("NotificationDebug", "Mensagem obtida: $message")
+                        showNotification(context, "Dica!", message)
+                    }.onFailure { e ->
+                        Log.e("NotificationError", "Falha ao buscar dica", e)
+                        showNotification(context, "Erro", "Falha ao carregar dica")
+                    }
+
+                } catch (e: Exception) {
+                    Log.e("NotificationReceiver", "Error fetching tip", e)
+                }
             }
-
-            val hasNewTips = checkForNewTips(context)
-            Log.d("NotificationReceiver", "Has new tips: $hasNewTips")
-
-            val title = if (hasNewTips) "Nova Dica de Segurança!" else "Bom Dia!"
-            val message =
-                if (hasNewTips) getLatestTip() else "Lembre-se de verificar locais seguros hoje!"
-
-            showNotification(context, title, message)
-
-            // Reagendar para o próximo dia
-            val viewModel = SettingsViewModel()
-            viewModel.scheduleNotification(context)
-
-        } catch (e: Exception) {
-            Log.e("NotificationReceiver", "Error showing notification", e)
         }
-    }
-
-    private fun checkForNewTips(context: Context): Boolean {
-        // Implemente a lógica real de verificação do banco de dados aqui
-        val prefs = context.getSharedPreferences("tips", Context.MODE_PRIVATE)
-        val lastCheck = prefs.getLong("last_tip_check", 0)
-        val currentTime = System.currentTimeMillis()
-        val hasNew = currentTime - lastCheck > 24 * 60 * 60 * 1000 // Simulação de nova dica diária
-        if (hasNew) prefs.edit().putLong("last_tip_check", currentTime).apply()
-        return hasNew
-    }
-
-    private fun getLatestTip(): String {
-        // Implemente a busca real no banco de dados aqui
-        return "Sempre verifique os ingredientes com o estabelecimento antes de consumir."
     }
 
     private fun showNotification(context: Context, title: String, message: String) {
@@ -70,21 +54,17 @@ class NotificationReceiver : BroadcastReceiver() {
             val channelId = "daily_tips_channel"
 
             // Criar ou atualizar o canal de notificação
-            val channel = notificationManager.getNotificationChannel(channelId)
-            if (channel == null) {
-                Log.d("NotificationReceiver", "Creating notification channel")
-                val newChannel = NotificationChannel(
-                    channelId,
-                    "Dicas Diárias",
-                    NotificationManager.IMPORTANCE_HIGH
-                ).apply {
-                    description = "Notificações com dicas de segurança para alérgicos"
-                    enableLights(true)
-                    lightColor = Color.RED
-                    enableVibration(true)
-                }
-                notificationManager.createNotificationChannel(newChannel)
+            val channel = NotificationChannel(
+                channelId,
+                "Dicas Diárias",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Notificações com dicas de segurança para alérgicos"
+                enableLights(true)
+                lightColor = Color.RED
+                enableVibration(true)
             }
+            notificationManager.createNotificationChannel(channel)
 
             val notification = NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(R.drawable.logo)
