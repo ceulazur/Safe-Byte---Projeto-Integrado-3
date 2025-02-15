@@ -20,11 +20,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.Calendar
-import java.util.Date
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 class SettingsViewModel : ViewModel() {
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
+
     private val _isDarkTheme = MutableStateFlow(false)
     val isDarkTheme: StateFlow<Boolean> = _isDarkTheme
 
@@ -54,6 +56,21 @@ class SettingsViewModel : ViewModel() {
             apply()
         }
     }
+
+//    fun fetchTips() {
+//        viewModelScope.launch {
+//            tipRepository.getAllTips()
+//                .onSuccess { tips ->
+//                    // Handle success
+//                    _tips.value = tips
+//                }
+//                .onFailure { error ->
+//                    // Handle error
+//                    Log.e("SettingsviewModel", "Error fetching tips", error)
+//                    _error.value = error.message
+//                }
+//        }
+//    }
 
     fun toggleNotifications(context: Context, enabled: Boolean) {
         viewModelScope.launch {
@@ -100,16 +117,13 @@ class SettingsViewModel : ViewModel() {
         }
     }
 
-    fun scheduleNotification(context: Context) {
+    private fun scheduleNotification(context: Context) {
         try {
-            Log.d("NotificationScheduler", "Starting notification scheduling")
-
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             val intent = Intent(context, NotificationReceiver::class.java).apply {
                 action = "DAILY_NOTIFICATION"
             }
 
-            Log.d("NotificationScheduler", "Creating PendingIntent")
             val pendingIntent = PendingIntent.getBroadcast(
                 context,
                 0,
@@ -117,13 +131,11 @@ class SettingsViewModel : ViewModel() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 
-            Log.d("NotificationScheduler", "Intent action: ${intent.action}")
-
             val calendar = Calendar.getInstance().apply {
                 timeInMillis = System.currentTimeMillis()
 
-                set(Calendar.HOUR_OF_DAY, 3) // o tempo é 3 horas adiantado
-                set(Calendar.MINUTE, 53)
+                set(Calendar.HOUR_OF_DAY, 13) // o tempo é 3 horas adiantado
+                set(Calendar.MINUTE, 0)
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
 
@@ -132,35 +144,24 @@ class SettingsViewModel : ViewModel() {
                 }
             }
 
-            Log.d("NotificationScheduler", "Scheduled time: ${calendar.time}")
-            Log.d("NotificationScheduler", "Current time: ${Date()}")
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 if (alarmManager.canScheduleExactAlarms()) {
-                    Log.d("NotificationScheduler", "Can schedule exact alarms")
                     alarmManager.setExactAndAllowWhileIdle(
                         AlarmManager.RTC_WAKEUP,
                         calendar.timeInMillis,
                         pendingIntent
                     )
                 } else {
-                    Log.e(
-                        "NotificationScheduler",
-                        "Cannot schedule exact alarms - permission not granted"
-                    )
-
                     val alarmIntent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
                     alarmIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     context.startActivity(alarmIntent)
                 }
-            } else
-                Log.d("NotificationScheduler", "Using setAlarmClock for older Android versions")
-                alarmManager.setAlarmClock(
-                    AlarmManager.AlarmClockInfo(calendar.timeInMillis, pendingIntent),
-                    pendingIntent
-                )
+            }
 
-            Log.d("NotificationScheduler", "Notification scheduled successfully")
+            alarmManager.setAlarmClock(
+                AlarmManager.AlarmClockInfo(calendar.timeInMillis, pendingIntent),
+                pendingIntent
+            )
         } catch (e: Exception) {
             Log.e("NotificationScheduler", "Error scheduling notification", e)
         }

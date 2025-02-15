@@ -1,13 +1,13 @@
 package com.example.safebyte.ui.screens
 
 import Doctor
-import DoctorItem
+import com.example.safebyte.ui.components.DoctorItem
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,7 +18,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.safebyte.R
 
@@ -29,7 +28,7 @@ fun DoctorProfileScreen(doctor: Doctor) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // Top section with DoctorItem
+        // Top section with com.example.safebyte.ui.components.DoctorItem
         DoctorItem(doctor = doctor)
 
         Spacer(modifier = Modifier.height(16.dp))
