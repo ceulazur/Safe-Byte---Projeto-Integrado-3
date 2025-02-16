@@ -1,4 +1,5 @@
-import android.net.Uri
+package com.example.safebyte.ui.screens
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,30 +19,22 @@ import androidx.navigation.compose.rememberNavController
 import com.example.safebyte.R
 import com.example.safebyte.ui.components.SecondaryTopBar
 
-data class Doctor(
-    val name: String,
-    val location: String,
-    val rating: Double
-)
-
 @Composable
-fun DoctorSearchScreen(
+fun RestaurantSearchScreen(
     navController: NavController,
-    onDoctorSelected: (Doctor) -> Unit
+    onRestaurantSelected: (Restaurant) -> Unit
 ) {
-    val doctors = listOf(
-        Doctor(name = "Dr. John Doe", location = "São Paulo, SP", rating = 4.5),
-        Doctor(name = "Dra. Maria Clara", location = "Rio de Janeiro, RJ", rating = 4.8),
-        Doctor(name = "Dr. Pedro Henrique", location = "Curitiba, PR", rating = 4.3)
+    val restaurants = listOf(
+        Restaurant(name = "Gourmet Delight", location = "São Paulo, SP", rating = 4.7),
+        Restaurant(name = "Sabor Carioca", location = "Rio de Janeiro, RJ", rating = 4.6),
+        Restaurant(name = "Delícias do Sul", location = "Curitiba, PR", rating = 4.5)
     )
 
     Scaffold(
         topBar = {
             SecondaryTopBar(
-                title = stringResource(R.string.medicos),
-                onBackClick = {
-                    navController.popBackStack()
-                }
+                title = stringResource(R.string.restaurantes),
+                onBackClick = { navController.popBackStack() }
             )
         }
     ) { paddingValues ->
@@ -51,14 +44,11 @@ fun DoctorSearchScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            SBLocationSearch()
             Spacer(modifier = Modifier.height(16.dp))
-
-            // Lista de médicos
-            doctors.forEach { doctor ->
-                DoctorListItem(
-                    doctor = doctor,
-                    onClick = { onDoctorSelected(doctor) }
+            restaurants.forEach { restaurant ->
+                RestaurantListItem(
+                    restaurant = restaurant,
+                    onClick = { onRestaurantSelected(restaurant) }
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -67,7 +57,7 @@ fun DoctorSearchScreen(
 }
 
 @Composable
-fun DoctorListItem(doctor: Doctor, onClick: () -> Unit) {
+fun RestaurantListItem(restaurant: Restaurant, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -80,8 +70,8 @@ fun DoctorListItem(doctor: Doctor, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_profile),
-                contentDescription = "Doctor Icon",
+                painter = painterResource(id = R.drawable.ic_restaurant),
+                contentDescription = "Restaurant Icon",
                 modifier = Modifier
                     .size(40.dp)
                     .background(Color.LightGray, CircleShape),
@@ -90,17 +80,17 @@ fun DoctorListItem(doctor: Doctor, onClick: () -> Unit) {
             Spacer(modifier = Modifier.width(16.dp))
             Column {
                 Text(
-                    text = doctor.name,
+                    text = restaurant.name,
                     style = MaterialTheme.typography.subtitle1,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = doctor.location,
+                    text = restaurant.location,
                     style = MaterialTheme.typography.body2,
                     color = Color.Gray
                 )
                 Text(
-                    text = "⭐ ${doctor.rating}",
+                    text = "⭐ ${restaurant.rating}",
                     style = MaterialTheme.typography.body2,
                     color = Color.Yellow
                 )
@@ -111,12 +101,12 @@ fun DoctorListItem(doctor: Doctor, onClick: () -> Unit) {
 
 @Preview(showBackground = true)
 @Composable
-fun DoctorSearchScreenPreview() {
+fun RestaurantSearchScreenPreview() {
     val navController = rememberNavController()
     MaterialTheme {
-        DoctorSearchScreen(
+        RestaurantSearchScreen(
             navController = navController,
-            onDoctorSelected = {}
+            onRestaurantSelected = {}
         )
     }
 }
