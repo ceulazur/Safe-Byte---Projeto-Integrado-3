@@ -33,6 +33,7 @@ fun HomeScreen(
                 when (buttonLabel) {
                     "Histórico alérgico" -> navController.navigate("allergy_history")
                     "Minhas alergias" -> navController.navigate("my_allergies")
+                    "Gerar QR-Code" -> navController.navigate("qr_code")
                     else -> onButtonClick(buttonLabel)
                 }
             }
