@@ -1,6 +1,6 @@
 package com.example.safebyte
 
-import NavGraph
+
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
+import com.example.safebyte.navigation.NavGraph
 import com.example.safebyte.ui.theme.SafeByteTheme
 import com.example.safebyte.ui.viewmodel.SettingsViewModel
 import com.google.firebase.FirebaseApp
