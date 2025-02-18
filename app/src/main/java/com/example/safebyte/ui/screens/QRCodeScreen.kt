@@ -74,7 +74,7 @@ fun QrCodeScreen(navController: NavController, user: User) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = qrData, style = MaterialTheme.typography.bodyMedium)
             Spacer(modifier = Modifier.height(32.dp))
-            Button(onClick = { navController.navigate("qr_code_scanner") }) {
+            Button(onClick = { navController.navigate("qr_scanner") }) {
                 Text("Ler QR Code")
             }
         }

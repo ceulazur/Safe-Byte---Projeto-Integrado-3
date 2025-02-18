@@ -5,6 +5,8 @@ import Doctor
 import DoctorSearchScreen
 import HomeScreen
 import MyAllergiesScreen
+import ProductDetailsScreen
+import ProductSearchScreen
 import android.net.Uri
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -90,10 +92,15 @@ fun NavGraph(
                         "Médico" -> navController.navigate("doctor_search")
                         "Restaurantes" -> navController.navigate("restaurant_search")
                         "Gerar QR-Code" -> navController.navigate("qr_code")
+                        "Verificar Produto" -> navController.navigate("product_search")
                         else -> println("Botão clicado: $label")
                     }
                 }
             )
+        }
+
+        composable("product_search") {
+            ProductSearchScreen(navController = navController)
         }
 
         composable("allergy_history") {
@@ -207,6 +214,15 @@ fun NavGraph(
             )
 
             RestaurantScreen(restaurant = restaurant)
+        }
+
+
+        composable(
+            "product_details/{barcode}",
+            arguments = listOf(navArgument("barcode") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val barcode = backStackEntry.arguments?.getString("barcode") ?: ""
+            ProductDetailsScreen(navController = navController, barcode = barcode)
         }
     }
 }

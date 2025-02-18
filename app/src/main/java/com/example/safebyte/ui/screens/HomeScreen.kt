@@ -34,6 +34,7 @@ fun HomeScreen(
                     "Histórico alérgico" -> navController.navigate("allergy_history")
                     "Minhas alergias" -> navController.navigate("my_allergies")
                     "Gerar QR-Code" -> navController.navigate("qr_code")
+                    "Verificar produto" -> navController.navigate("product_search")
                     else -> onButtonClick(buttonLabel)
                 }
             }
