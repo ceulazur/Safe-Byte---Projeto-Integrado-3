@@ -1,6 +1,5 @@
 package com.example.safebyte.ui.screens
 
-import Doctor
 import com.example.safebyte.ui.components.DoctorItem
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

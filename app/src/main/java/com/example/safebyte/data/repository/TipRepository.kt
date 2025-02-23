@@ -10,13 +10,6 @@ class TipRepository {
         private const val TABLE_NAME = "tips"
     }
 
-//    suspend fun insertTip(tip: Tip): Result<Tip> =
-//        ClientSupabase.withSupabase { client ->
-//            client.from(TABLE_NAME)
-//                .insert(tip) { select() }
-//                .decodeAs<Tip>()
-//        }
-
     suspend fun getLastTip(): Result<Tip?> =
         ClientSupabase.withSupabase { client ->
             client.from(TABLE_NAME)
@@ -27,11 +20,4 @@ class TipRepository {
                 .decodeList<Tip>()
                 .firstOrNull()
         }
-
-//    suspend fun getAllTips(): Result<List<Tip>> =
-//        ClientSupabase.withSupabase { client ->
-//            client.from(TABLE_NAME)
-//                .select()
-//                .decodeList<Tip>()
-//        }
 }

@@ -1,4 +1,4 @@
-package com.example.safebyte.ui.components
+package com.example.safebyte.ui.components;
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,7 +20,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -34,36 +33,40 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.safebyte.R
-import com.example.safebyte.ui.theme.SafeByteTheme
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import com.example.safebyte.data.model.TimelineEvent
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 
 enum class TimelineNodePosition {
-    FIRST,
-    MIDDLE,
-    LAST
+    FIRST, MIDDLE, LAST
 }
 
-data class CircleParameters(
-    val radius: Dp
-)
+data class CircleParameters(val radius: Dp)
+data class LineParameters(val strokeWidth: Dp)
 
-data class LineParameters(
-    val strokeWidth: Dp
-)
-
-data class TimelineEvent(
-    val id: Int = 0,
-    val date: Long,
-    val videoUrl: String? = null,
-    val activitiesList: List<String>
-)
+// Safe date formatting function
+private fun formatDate(dateStr: String): String {
+    return try {
+        // Try parsing as ISO date (yyyy-MM-dd)
+        val date = LocalDate.parse(dateStr)
+        date.format(DateTimeFormatter.ofPattern("dd MMM yyyy"))
+    } catch (e: DateTimeParseException) {
+        try {
+            // Try parsing as timestamp
+            val timestamp = dateStr.toLong()
+            val date = LocalDate.ofEpochDay(timestamp / (24 * 60 * 60 * 1000))
+            date.format(DateTimeFormatter.ofPattern("dd MMM yyyy"))
+        } catch (e: Exception) {
+            // Return original string if all parsing fails
+            dateStr
+        }
+    }
+}
 
 @Composable
 fun TimelineNode(
@@ -72,7 +75,7 @@ fun TimelineNode(
     lineParameters: LineParameters? = null,
     contentStartOffset: Dp = 16.dp,
     spaceBetweenNodes: Dp = 32.dp,
-    content: @Composable BoxScope.(modifier: Modifier) -> Unit
+    content: @Composable BoxScope.(modifier: Modifier) -> Unit,
 ) {
     val circleColor: Color = MaterialTheme.colorScheme.secondary
 
@@ -106,17 +109,11 @@ fun TimelineNode(
     }
 }
 
-fun dateToStringFormat(datetime: Long): String {
-    val date = Date(datetime)
-    val format = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
-    return format.format(date)
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SecondaryTopBar(
     title: String,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
 ) {
     TopAppBar(
         title = {
@@ -145,7 +142,7 @@ fun SecondaryTopBar(
 @Composable
 fun Timeline(
     timelineEventList: List<TimelineEvent>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
 
@@ -155,16 +152,20 @@ fun Timeline(
     ) {
         items(
             count = timelineEventList.size,
-            key = { timelineEventList[it].id }
-        ) { mediaContent ->
+            key = { timelineEventList[it].id!! }
+        ) { index ->
             TimelineNode(
-                pos = TimelineNodePosition.FIRST,
+                pos = when (index) {
+                    0 -> TimelineNodePosition.FIRST
+                    timelineEventList.size - 1 -> TimelineNodePosition.LAST
+                    else -> TimelineNodePosition.MIDDLE
+                },
                 circleParameters = CircleParameters(6.dp),
-                lineParameters = LineParameters(3.dp)
+                lineParameters = if (index < timelineEventList.size - 1) LineParameters(3.dp) else null
             ) { modifier ->
                 MessageBubble(
-                    mediaContent = timelineEventList[mediaContent],
-                    modifier
+                    mediaContent = timelineEventList[index],
+                    modifier = modifier
                 )
             }
         }
@@ -174,7 +175,7 @@ fun Timeline(
 @Composable
 fun MessageBubble(
     mediaContent: TimelineEvent,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     Column(
         modifier = modifier
@@ -184,7 +185,7 @@ fun MessageBubble(
     ) {
         Row {
             Text(
-                text = dateToStringFormat(datetime = mediaContent.date),
+                text = formatDate(mediaContent.date.toString()),
                 modifier = Modifier.padding(12.dp),
                 fontWeight = FontWeight.Medium
             )
@@ -196,7 +197,7 @@ fun MessageBubble(
                     .fillMaxWidth()
                     .wrapContentHeight()
             ) {
-                mediaContent.videoUrl?.let { videoUrl ->
+                mediaContent.videourl?.let { videoUrl ->
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -215,7 +216,7 @@ fun MessageBubble(
                     }
                 }
 
-                mediaContent.activitiesList.forEach { activity ->
+                mediaContent.activitieslist.forEach { activity ->
                     Row(
                         modifier = Modifier.padding(horizontal = 12.dp),
                         verticalAlignment = Alignment.CenterVertically
@@ -233,49 +234,6 @@ fun MessageBubble(
                     }
                 }
             }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun TimelineNodePreview() {
-    val allergyHistory = listOf(
-        TimelineEvent(
-            date = Date().time,
-            videoUrl = "https://firebasestorage.googleapis.com/v0/b/aluno-d3928.appspot.com/o/profileImages%2F10240187-sd_360_640_30fps.mp4?alt=media&token=b956caff-2380-43df-9e9f-283b52219a6d",
-            activitiesList = listOf(
-                "Activity 1",
-                "Activity 2",
-                "Activity 3",
-                "Activity 4",
-                "Activity 5",
-            )
-        )
-    )
-
-    SafeByteTheme(
-        darkTheme = false
-    ) {
-        Scaffold(
-            topBar = {
-                SecondaryTopBar(
-                    title = "Home",
-                    onBackClick = {}
-                )
-            }
-        ) { paddingValues ->
-            Column (
-                horizontalAlignment = Alignment.End
-            ){
-                SBButtonPrimary(
-                    label = "Adicionar eventos"
-                )
-            }
-            Timeline(
-                timelineEventList = allergyHistory,
-                modifier = Modifier.padding(paddingValues)
-            )
         }
     }
 }
