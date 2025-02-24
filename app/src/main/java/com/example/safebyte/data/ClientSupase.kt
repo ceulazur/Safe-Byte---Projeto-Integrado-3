@@ -35,7 +35,6 @@ object ClientSupabase {
     suspend fun <T> withSupabase(block: suspend (SupabaseClient) -> T): Result<T> {
         return try {
             withContext(Dispatchers.IO) {
-                // verificar conexao:
                 val url = getInstance().supabaseHttpUrl
                 Log.d("ClientSupabase", "Supabase URL: $url")
 
@@ -45,6 +44,7 @@ object ClientSupabase {
                 Result.success(block(getInstance()))
             }
         } catch (e: Exception) {
+            Log.e("ClientSupabase", "Error: ${e.message}", e)
             Result.failure(e)
         }
     }

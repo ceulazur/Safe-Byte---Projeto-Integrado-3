@@ -1,5 +1,6 @@
 package com.example.safebyte.ui.screens
 
+import android.annotation.SuppressLint
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -8,10 +9,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
-import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
@@ -19,6 +20,7 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -29,6 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,27 +39,30 @@ import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.safebyte.R
+import com.example.safebyte.data.model.TimelineEvent
 import com.example.safebyte.ui.components.SBButtonPrimary
 import com.example.safebyte.ui.components.SBTextField
 import com.example.safebyte.ui.components.SecondaryTopBar
 import com.example.safebyte.ui.components.Timeline
-import com.example.safebyte.ui.components.TimelineEvent
 import com.example.safebyte.ui.viewmodel.AllergyHistoryViewModel
 import com.example.safebyte.ui.viewmodel.UploadState
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
+@SuppressLint("MutableCollectionMutableState")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddNewRecordModal(
     navController: NavController,
     allergyHistoryViewModel: AllergyHistoryViewModel,
     onDismiss: () -> Unit,
-    onSaveRecord: (TimelineEvent) -> Unit
+    onSaveRecord: (TimelineEvent) -> Unit,
 ) {
     val allergyHistory by allergyHistoryViewModel.allergyHistoryState
 
@@ -85,7 +91,7 @@ fun AddNewRecordModal(
     }
 
     fun Long.toBrazilianDateFormat(
-        pattern: String = "dd/MM/yyyy"
+        pattern: String = "dd/MM/yyyy",
     ): String {
         val date = Date(this)
         val formatter = SimpleDateFormat(
@@ -150,16 +156,6 @@ fun AddNewRecordModal(
                     }
                 }
 
-//                Text("Link do vídeo:")
-//
-//                // Video URL Input
-//                SBTextField(
-//                    value = newRecordVideoUrl,
-//                    onTextChange = { newRecordVideoUrl = it },
-//                    placeholder = "Cole o link do vídeo",
-//                    modifier = Modifier.fillMaxWidth()
-//                )
-
                 Text("Vídeo:")
 
                 Column(
@@ -184,6 +180,7 @@ fun AddNewRecordModal(
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
+
                         is UploadState.Success -> {
                             Text(
                                 text = "✓ Vídeo enviado com sucesso",
@@ -192,6 +189,7 @@ fun AddNewRecordModal(
                             )
                             newRecordVideoUrl = (uploadState as UploadState.Success).downloadUrl
                         }
+
                         is UploadState.Error -> {
                             Text(
                                 text = "Erro ao enviar vídeo: ${(uploadState as UploadState.Error).message}",
@@ -199,7 +197,9 @@ fun AddNewRecordModal(
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
-                        else -> { /* Initial state, nothing to show */ }
+
+                        else -> { /* Initial state, nothing to show */
+                        }
                     }
                 }
 
@@ -265,8 +265,8 @@ fun AddNewRecordModal(
                     val newRecord = TimelineEvent(
                         id = allergyHistory.size + 1,
                         date = newRecordDate.displayedMonthMillis,
-                        videoUrl = newRecordVideoUrl,
-                        activitiesList = newRecordActivities.toList()
+                        videourl = newRecordVideoUrl,
+                        activitieslist = newRecordActivities.toList()
                     )
                     onSaveRecord(newRecord)
                     onDismiss()
@@ -288,31 +288,31 @@ fun AddNewRecordModal(
 
 
 @Composable
-fun AllergyHistoryScreen(navController: NavController) {
+fun AllergyHistoryScreen(
+    navController: NavController,
+    viewModel: AllergyHistoryViewModel = viewModel(),
+) {
     var showDialog by remember { mutableStateOf(false) }
 
-    val allergyHistory = listOf(
-        TimelineEvent(
-            id = 1,
-            date = Date().time,
-            videoUrl = "https://firebasestorage.googleapis.com/v0/b/aluno-d3928.appspot.com/o/profileImages%2F10240187-sd_360_640_30fps.mp4?alt=media&token=b956caff-2380-43df-9e9f-283b52219a6d",
-            activitiesList = listOf(
-                "Activity 1",
-                "Activity 2",
-                "Activity 3",
-                "Activity 4",
-                "Activity 5",
-            )
-        ), TimelineEvent(
-            id = 2,
-            date = Date().time,
-            videoUrl = "https://firebasestorage.googleapis.com/v0/b/aluno-d3928.appspot.com/o/profileImages%2F10240187-sd_360_640_30fps.mp4?alt=media&token=b956caff-2380-43df-9e9f-283b52219a6d",
-            activitiesList = listOf(
-                "Activity 1", "Activity 2", "Activity 3", "Activity 4", "Activity 5"
-            )
-        )
-    )
+    val scaffoldState = rememberScaffoldState()
 
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(key1 = true) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is AllergyHistoryViewModel.UiEvent.ShowError -> {
+                    scaffoldState.snackbarHostState.showSnackbar(event.message)
+                }
+
+                is AllergyHistoryViewModel.UiEvent.ShowSuccess -> {
+                    scaffoldState.snackbarHostState.showSnackbar(event.message)
+                }
+            }
+        }
+    }
+
+    val allergyHistory: List<TimelineEvent> = viewModel.allergyHistoryState.value
     Scaffold(topBar = {
         SecondaryTopBar(title = stringResource(R.string.historico_de_alergias), onBackClick = {
             navController.popBackStack()
@@ -371,10 +371,16 @@ fun AllergyHistoryScreen(navController: NavController) {
         if (showDialog) {
             AddNewRecordModal(
                 navController = navController,
-                allergyHistoryViewModel = AllergyHistoryViewModel(),
+                allergyHistoryViewModel = viewModel,
                 onDismiss = { showDialog = false },
-                onSaveRecord = {
-                    showDialog = false
+                onSaveRecord = { newAllergyHistoryItem ->
+                    coroutineScope.launch {
+                        val success = viewModel.addAllergyHistoryItem(newAllergyHistoryItem)
+                        if (success) {
+                            showDialog = false
+                        }
+                    }
+
                 }
             )
         }

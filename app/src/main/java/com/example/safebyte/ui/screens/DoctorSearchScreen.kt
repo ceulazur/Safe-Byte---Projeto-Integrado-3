@@ -1,4 +1,5 @@
-import android.net.Uri
+package com.example.safebyte.ui.screens;
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,18 +17,19 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.safebyte.R
+import com.example.safebyte.ui.components.SBLocationSearch
 import com.example.safebyte.ui.components.SecondaryTopBar
 
 data class Doctor(
     val name: String,
     val location: String,
-    val rating: Double
+    val rating: Double,
 )
 
 @Composable
 fun DoctorSearchScreen(
     navController: NavController,
-    onDoctorSelected: (Doctor) -> Unit
+    onDoctorSelected: (Doctor) -> Unit,
 ) {
     val doctors = listOf(
         Doctor(name = "Dr. John Doe", location = "São Paulo, SP", rating = 4.5),

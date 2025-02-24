@@ -74,6 +74,9 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.google.accompanist.navigation.animation)
 
+    // Retrofit
+    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
+
     // datastore
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.datastore.preferences.core)
@@ -127,6 +130,7 @@ dependencies {
     implementation(libs.androidx.foundation.layout.android)
     implementation(libs.firebase.vertexai)
     implementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.runtime.livedata)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

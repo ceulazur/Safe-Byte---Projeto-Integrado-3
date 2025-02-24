@@ -1,5 +1,6 @@
 package com.example.safebyte.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.runtime.Composable
@@ -17,23 +18,26 @@ import androidx.media3.ui.PlayerView
 @Composable
 fun VideoPlayer(
     modifier: Modifier = Modifier,
-    videoUrl: String
+    videoUrl: String?
 ) {
+    Log.d("VideoPlayer", "Video URL: $videoUrl")
     val context = LocalContext.current
 
-    // Use `remember` to hold the ExoPlayer instance
+    // Use `remember` para criar o ExoPlayer
     val exoPlayer = remember {
-        ExoPlayer.Builder(context).build().apply {
-            setMediaItem(MediaItem.fromUri(videoUrl))
+        ExoPlayer.Builder(context).build()
+    }
+
+    // Atualiza o media item sempre que a URL muda
+    LaunchedEffect(videoUrl) {
+        if (videoUrl != null) {
+            val mediaItem = MediaItem.fromUri(videoUrl)
+            exoPlayer.setMediaItem(mediaItem)
+            exoPlayer.prepare()
         }
     }
 
-    // Prepare ExoPlayer asynchronously to avoid blocking the main thread
-    LaunchedEffect(exoPlayer) {
-        exoPlayer.prepare()
-    }
-
-    // Ensure proper cleanup of ExoPlayer
+    // Liberar recursos ao sair da tela
     DisposableEffect(exoPlayer) {
         onDispose {
             exoPlayer.release()
@@ -47,3 +51,4 @@ fun VideoPlayer(
             .heightIn(min = 200.dp)
     )
 }
+

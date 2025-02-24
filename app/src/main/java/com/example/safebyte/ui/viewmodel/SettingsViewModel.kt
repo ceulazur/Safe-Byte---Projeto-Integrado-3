@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
@@ -56,21 +57,6 @@ class SettingsViewModel : ViewModel() {
             apply()
         }
     }
-
-//    fun fetchTips() {
-//        viewModelScope.launch {
-//            tipRepository.getAllTips()
-//                .onSuccess { tips ->
-//                    // Handle success
-//                    _tips.value = tips
-//                }
-//                .onFailure { error ->
-//                    // Handle error
-//                    Log.e("SettingsviewModel", "Error fetching tips", error)
-//                    _error.value = error.message
-//                }
-//        }
-//    }
 
     fun toggleNotifications(context: Context, enabled: Boolean) {
         viewModelScope.launch {
@@ -191,13 +177,17 @@ class SettingsViewModel : ViewModel() {
     fun loadThemeState(context: Context) {
         viewModelScope.launch {
             context.dataStore.data
-                .map { preferences ->
-                    preferences[THEME_KEY] ?: false
-                }
+                .map { preferences -> preferences[THEME_KEY] }
                 .collect { isDark ->
                     _isDarkTheme.value = isDark
+                        ?: isSystemInDarkMode(context)
                 }
         }
+    }
+
+    private fun isSystemInDarkMode(context: Context): Boolean {
+        return context.resources.configuration.uiMode and
+                Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     }
 
     companion object {

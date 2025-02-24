@@ -1,6 +1,5 @@
 package com.example.safebyte.ui.components
 
-import Doctor
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.safebyte.R
+import com.example.safebyte.ui.screens.Doctor
 
 @Composable
 fun SBDoctorList() {

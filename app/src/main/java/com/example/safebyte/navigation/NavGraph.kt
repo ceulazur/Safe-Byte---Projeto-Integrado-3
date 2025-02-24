@@ -1,8 +1,5 @@
 package com.example.safebyte.navigation
 
-import AllergyInfoScreen
-import Doctor
-import DoctorSearchScreen
 import HomeScreen
 import MyAllergiesScreen
 import ProductDetailsScreen
@@ -24,7 +21,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.safebyte.ui.screens.AllergyHistoryScreen
+import com.example.safebyte.ui.screens.AllergyInfoScreen
+import com.example.safebyte.ui.screens.Doctor
 import com.example.safebyte.ui.screens.DoctorProfileScreen
+import com.example.safebyte.ui.screens.DoctorSearchScreen
 import com.example.safebyte.ui.screens.FAQScreen
 import com.example.safebyte.ui.screens.LoginScreen
 import com.example.safebyte.ui.screens.QrCodeScannerScreen
