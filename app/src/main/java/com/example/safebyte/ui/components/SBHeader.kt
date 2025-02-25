@@ -1,3 +1,5 @@
+import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,12 +26,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.safebyte.R
 import com.example.safebyte.ui.theme.Typography
 
 @Composable
-fun SBHeader(userName: String, navController: NavHostController) {
-
+fun SBHeader(userName: String, navController: NavHostController, profileImageUri: Uri?) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -38,67 +40,73 @@ fun SBHeader(userName: String, navController: NavHostController) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
+        // Seção de logo e nome SafeByte
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .background(Color(0xFFD8E8ED), shape = CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_heart),
-                        contentDescription = "Logo",
-                        tint = Color(0xFF0F152B),
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Allergic Care",
-                    style = Typography.bodyLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        color = Color(0xFF0F152B)
-                    )
-                )
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "Seja bem-vindo,",
-                style = Typography.bodySmall.copy(
-                    fontSize = 14.sp,
-                    color = Color(0xFF576675)
-                )
-            )
-            Text(
-                text = userName,
-                style = Typography.bodySmall.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
-                    color = Color(0xFF0F152B)
-                )
-            )
+            LogoSection()
+            Spacer(modifier = Modifier.height(8.dp)) // Espaço entre logo e saudação
+            GreetingSection(userName)
         }
 
-        // Ícone de perfil com navegação
+        // Seção de perfil
+        ProfileSection(navController, profileImageUri)
+    }
+}
+
+@Composable
+fun LogoSection() {
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Box(
             modifier = Modifier
                 .size(48.dp)
                 .background(Color(0xFFD8E8ED), shape = CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            // Adicionando o IconButton com navegação
-            IconButton(onClick = {
-                // Navega para a tela de foto de perfil quando o ícone de perfil for pressionado
-                navController.navigate("profile_picture")
-            }) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_heart),
+                contentDescription = "Logo",
+                tint = Color(0xFF0F152B),
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = "SafeByte",
+            color = Color(0xFF0F152B),
+            modifier = Modifier.align(Alignment.CenterVertically)
+        )
+    }
+}
+
+@Composable
+fun GreetingSection(userName: String) {
+    Text(
+        text = "Seja bem-vindo, $userName",
+        color = Color.Black,
+        modifier = Modifier.padding(top = 4.dp)
+    )
+}
+
+@Composable
+fun ProfileSection(navController: NavHostController, profileImageUri: Uri?) {
+    IconButton(onClick = { navController.navigate("profile_picture") }) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .background(Color(0xFFD8E8ED), shape = CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            if (profileImageUri != null) {
+                Image(
+                    painter = rememberAsyncImagePainter(profileImageUri),
+                    contentDescription = "Foto de Perfil",
+                    modifier = Modifier.size(48.dp)
+                )
+            } else {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_profile),
                     contentDescription = "Perfil",
@@ -110,9 +118,3 @@ fun SBHeader(userName: String, navController: NavHostController) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewHeader() {
-    val navController = rememberNavController()
-    SBHeader(userName = "Francisco", navController = navController)
-}

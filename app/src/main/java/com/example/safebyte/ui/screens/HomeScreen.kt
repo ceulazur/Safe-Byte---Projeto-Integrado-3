@@ -1,6 +1,12 @@
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -13,14 +19,27 @@ fun HomeScreen(
     navController: NavHostController,
     onButtonClick: (String) -> Unit
 ) {
+
+    val context = LocalContext.current
+    var profileImageUri by remember { mutableStateOf(getSavedProfilePicture(context)) }
+
     Column(modifier = Modifier.fillMaxSize()) {
         // Cabeçalho
         SBHeader(
             userName = userName,
-            navController = navController
+            navController = navController,
+            profileImageUri = profileImageUri
         )
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        LaunchedEffect(navController) {
+            navController.addOnDestinationChangedListener { _, destination, _ ->
+                if (destination.route == "profile_picture") {
+                    profileImageUri = getSavedProfilePicture(context)
+                }
+            }
+        }
 
         // Seção: Principais Serviços
         SBButtonBox(
