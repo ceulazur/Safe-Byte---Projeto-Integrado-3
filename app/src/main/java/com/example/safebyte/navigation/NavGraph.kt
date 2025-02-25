@@ -4,6 +4,7 @@ import HomeScreen
 import MyAllergiesScreen
 import ProductDetailsScreen
 import ProductSearchScreen
+import ProfilePictureScreen
 import android.net.Uri
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -146,6 +147,10 @@ fun NavGraph(
             QrCodeScannerScreen(navController = navController, onQrCodeScanned = { qrData ->
                 navController.navigate("qr_report/${Uri.encode(qrData)}")
             })
+        }
+
+        composable("profile_picture") {
+            ProfilePictureScreen(onImageSelected = { uri -> })
         }
 
         composable("doctor_search") {
