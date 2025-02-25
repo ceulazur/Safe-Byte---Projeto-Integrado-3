@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,11 +22,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.safebyte.R
 import com.example.safebyte.ui.theme.Typography
 
 @Composable
-fun SBHeader(userName: String) {
+fun SBHeader(userName: String, navController: NavHostController) {
 
     Row(
         modifier = Modifier
@@ -84,26 +87,32 @@ fun SBHeader(userName: String) {
             )
         }
 
-
+        // Ícone de perfil com navegação
         Box(
             modifier = Modifier
                 .size(48.dp)
                 .background(Color(0xFFD8E8ED), shape = CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_profile),
-                contentDescription = "Perfil",
-                tint = Color(0xFF0F152B),
-                modifier = Modifier.size(24.dp)
-            )
+            // Adicionando o IconButton com navegação
+            IconButton(onClick = {
+                // Navega para a tela de foto de perfil quando o ícone de perfil for pressionado
+                navController.navigate("profile_picture")
+            }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_profile),
+                    contentDescription = "Perfil",
+                    tint = Color(0xFF0F152B),
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 fun PreviewHeader() {
-    SBHeader(userName = "Francisco")
+    val navController = rememberNavController()
+    SBHeader(userName = "Francisco", navController = navController)
 }

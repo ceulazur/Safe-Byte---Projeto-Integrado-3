@@ -15,7 +15,10 @@ fun HomeScreen(
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         // Cabeçalho
-        SBHeader(userName = userName)
+        SBHeader(
+            userName = userName,
+            navController = navController
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
