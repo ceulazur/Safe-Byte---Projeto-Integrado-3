@@ -55,7 +55,7 @@ fun NavGraph(
         startDestination = if (isLoggedIn) "home" else "login",
         enterTransition = {
             if (isAnimationsEnabled) {
-                fadeIn(animationSpec = tween(300))
+                fadeIn(animationSpec = tween(800))
             } else {
                 EnterTransition.None
             }
