@@ -45,7 +45,6 @@ class SettingsViewModel(application: Application): AndroidViewModel(application)
         }
     }
 
-
     fun toggleAnimations(context: Context, enabled: Boolean) {
         viewModelScope.launch {
             try {
@@ -163,12 +162,6 @@ class SettingsViewModel(application: Application): AndroidViewModel(application)
         return SettingsRepository(db.settingsDao())
     }
 
-//    fun loadAnimationState(context: Context) {
-//        val sharedPref = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-//        val animationsEnabled = sharedPref.getBoolean("animations_enabled", true)
-//        _isAnimationsEnabled.value = animationsEnabled
-//    }
-
     private fun saveAnimationState(context: Context, enabled: Boolean) {
         val sharedPref = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
@@ -176,51 +169,6 @@ class SettingsViewModel(application: Application): AndroidViewModel(application)
             apply()
         }
     }
-
-//    fun toggleNotifications(context: Context, enabled: Boolean) {
-//        viewModelScope.launch {
-//            try {
-//                _isNotificationEnabled.value = enabled
-//
-//                // Salva no DataStore
-//                context.dataStore.edit { preferences ->
-//                    preferences[NOTIFICATION_KEY] = enabled
-//                }
-//
-//                // Agenda ou cancela a notificação
-//                if (enabled) {
-//                    scheduleNotification(context)
-//                } else {
-//                    cancelNotification(context)
-//                }
-//            } catch (e: Exception) {
-//                Log.e("SettingsViewModel", "Error saving notification preference", e)
-//            }
-//        }
-//    }
-
-//    fun loadNotificationState(context: Context) {
-//        viewModelScope.launch {
-//            try {
-//                context.dataStore.data
-//                    .map { preferences ->
-//                        preferences[NOTIFICATION_KEY] ?: false
-//                    }
-//                    .collect { enabled ->
-//                        _isNotificationEnabled.value = enabled
-//                        Log.d("SettingsViewModel", "Notification preference loaded: $enabled")
-//
-//                        if (enabled) {
-//                            scheduleNotification(context)
-//                        } else {
-//                            cancelNotification(context)
-//                        }
-//                    }
-//            } catch (e: Exception) {
-//                Log.e("SettingsViewModel", "Error loading notification preference", e)
-//            }
-//        }
-//    }
 
     private fun scheduleNotification(context: Context) {
         try {
@@ -287,10 +235,5 @@ class SettingsViewModel(application: Application): AndroidViewModel(application)
     private fun isSystemInDarkMode(context: Context): Boolean {
         return context.resources.configuration.uiMode and
                 Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
-    }
-
-    companion object {
-        val THEME_KEY = booleanPreferencesKey("dark_theme")
-        val NOTIFICATION_KEY = booleanPreferencesKey("notifications_enabled")
     }
 }
