@@ -1,6 +1,7 @@
 package com.example.safebyte.ui.viewmodel
 
 import android.app.AlarmManager
+import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -8,23 +9,21 @@ import android.content.res.Configuration
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.test.core.app.ApplicationProvider
+import com.example.safebyte.data.local.AppDatabase
+import com.example.safebyte.data.repository.SettingsRepository
 import com.example.safebyte.receiver.NotificationReceiver
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.Calendar
+import kotlinx.coroutines.flow.firstOrNull
 
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-
-class SettingsViewModel : ViewModel() {
+class SettingsViewModel(application: Application): AndroidViewModel(application) {
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
@@ -37,38 +36,65 @@ class SettingsViewModel : ViewModel() {
     private val _isAnimationsEnabled = MutableStateFlow(true)
     val isAnimationsEnabled: StateFlow<Boolean> = _isAnimationsEnabled
 
+    init {
+        viewModelScope.launch {
+            val context = getApplication<Application>().applicationContext
+            loadThemeState(context)
+            loadNotificationState(context)
+            loadAnimationState(context)
+        }
+    }
+
+
     fun toggleAnimations(context: Context, enabled: Boolean) {
-        _isAnimationsEnabled.value = enabled
-        saveAnimationState(
-            context, enabled
-        )
+        viewModelScope.launch {
+            try {
+                val repository = getRepository(context)
+                val currentSettings = repository.getSettings().firstOrNull()
+
+                val newSettings = currentSettings?.copy(animationsEnabled = enabled) ?: com.example.safebyte.data.local.Settings(
+                    id = 0,
+                    animationsEnabled = enabled,
+                    darkThemeEnabled = _isDarkTheme.value,
+                    notificationsEnabled = _isNotificationEnabled.value
+                )
+
+                repository.insertSettings(newSettings)
+                _isAnimationsEnabled.value = enabled
+            } catch (e: Exception) {
+                Log.e("SettingsViewModel", "Error toggling animations", e)
+            }
+        }
     }
 
     fun loadAnimationState(context: Context) {
-        val sharedPref = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-        val animationsEnabled = sharedPref.getBoolean("animations_enabled", true)
-        _isAnimationsEnabled.value = animationsEnabled
-    }
-
-    private fun saveAnimationState(context: Context, enabled: Boolean) {
-        val sharedPref = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-        with(sharedPref.edit()) {
-            putBoolean("animations_enabled", enabled)
-            apply()
+        viewModelScope.launch {
+            try {
+                getRepository(context).getSettings().collect { settings ->
+                    _isAnimationsEnabled.value = settings?.animationsEnabled ?: true
+                }
+            } catch (e: Exception) {
+                Log.e("SettingsViewModel", "Error loading animations", e)
+            }
         }
     }
 
     fun toggleNotifications(context: Context, enabled: Boolean) {
         viewModelScope.launch {
             try {
+                val repository = getRepository(context)
+                val currentSettings = repository.getSettings().firstOrNull()
+
+                val newSettings = currentSettings?.copy(notificationsEnabled = enabled) ?: com.example.safebyte.data.local.Settings(
+                    id = 0,
+                    notificationsEnabled = enabled,
+                    darkThemeEnabled = _isDarkTheme.value,
+                    animationsEnabled = _isAnimationsEnabled.value
+                )
+
+                repository.insertSettings(newSettings)
                 _isNotificationEnabled.value = enabled
 
-                // Salva no DataStore
-                context.dataStore.edit { preferences ->
-                    preferences[NOTIFICATION_KEY] = enabled
-                }
-
-                // Agenda ou cancela a notificação
                 if (enabled) {
                     scheduleNotification(context)
                 } else {
@@ -80,28 +106,121 @@ class SettingsViewModel : ViewModel() {
         }
     }
 
+    fun toggleTheme(isDark: Boolean, context: Context) {
+        viewModelScope.launch {
+            try {
+                val repository = getRepository(context)
+                val currentSettings = repository.getSettings().firstOrNull()
+
+                val newSettings = currentSettings?.copy(darkThemeEnabled = isDark) ?: com.example.safebyte.data.local.Settings(
+                    id = 0,
+                    darkThemeEnabled = isDark,
+                    notificationsEnabled = _isNotificationEnabled.value,
+                    animationsEnabled = _isAnimationsEnabled.value
+                )
+
+                repository.insertSettings(newSettings)
+                _isDarkTheme.value = isDark
+            } catch (e: Exception) {
+                Log.e("SettingsViewModel", "Error toggling theme", e)
+            }
+        }
+    }
+
     fun loadNotificationState(context: Context) {
         viewModelScope.launch {
             try {
-                context.dataStore.data
-                    .map { preferences ->
-                        preferences[NOTIFICATION_KEY] ?: false
-                    }
-                    .collect { enabled ->
-                        _isNotificationEnabled.value = enabled
-                        Log.d("SettingsViewModel", "Notification preference loaded: $enabled")
+                getRepository(context).getSettings().collect { settings ->
+                    val enabled = settings?.notificationsEnabled ?: false
+                    _isNotificationEnabled.value = enabled
 
-                        if (enabled) {
-                            scheduleNotification(context)
-                        } else {
-                            cancelNotification(context)
-                        }
+                    if (enabled) {
+                        scheduleNotification(context)
+                    } else {
+                        cancelNotification(context)
                     }
+                }
             } catch (e: Exception) {
                 Log.e("SettingsViewModel", "Error loading notification preference", e)
             }
         }
     }
+
+    fun loadThemeState(context: Context) {
+        viewModelScope.launch {
+            try {
+                getRepository(context).getSettings().collect { settings ->
+                    _isDarkTheme.value = settings?.darkThemeEnabled ?: isSystemInDarkMode(context)
+                }
+            } catch (e: Exception) {
+                Log.e("SettingsViewModel", "Error loading theme", e)
+            }
+        }
+    }
+
+    private fun getRepository(context: Context): SettingsRepository {
+        val db = AppDatabase.getDatabase(context)
+        return SettingsRepository(db.settingsDao())
+    }
+
+//    fun loadAnimationState(context: Context) {
+//        val sharedPref = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+//        val animationsEnabled = sharedPref.getBoolean("animations_enabled", true)
+//        _isAnimationsEnabled.value = animationsEnabled
+//    }
+
+    private fun saveAnimationState(context: Context, enabled: Boolean) {
+        val sharedPref = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putBoolean("animations_enabled", enabled)
+            apply()
+        }
+    }
+
+//    fun toggleNotifications(context: Context, enabled: Boolean) {
+//        viewModelScope.launch {
+//            try {
+//                _isNotificationEnabled.value = enabled
+//
+//                // Salva no DataStore
+//                context.dataStore.edit { preferences ->
+//                    preferences[NOTIFICATION_KEY] = enabled
+//                }
+//
+//                // Agenda ou cancela a notificação
+//                if (enabled) {
+//                    scheduleNotification(context)
+//                } else {
+//                    cancelNotification(context)
+//                }
+//            } catch (e: Exception) {
+//                Log.e("SettingsViewModel", "Error saving notification preference", e)
+//            }
+//        }
+//    }
+
+//    fun loadNotificationState(context: Context) {
+//        viewModelScope.launch {
+//            try {
+//                context.dataStore.data
+//                    .map { preferences ->
+//                        preferences[NOTIFICATION_KEY] ?: false
+//                    }
+//                    .collect { enabled ->
+//                        _isNotificationEnabled.value = enabled
+//                        Log.d("SettingsViewModel", "Notification preference loaded: $enabled")
+//
+//                        if (enabled) {
+//                            scheduleNotification(context)
+//                        } else {
+//                            cancelNotification(context)
+//                        }
+//                    }
+//            } catch (e: Exception) {
+//                Log.e("SettingsViewModel", "Error loading notification preference", e)
+//            }
+//        }
+//    }
 
     private fun scheduleNotification(context: Context) {
         try {
@@ -163,26 +282,6 @@ class SettingsViewModel : ViewModel() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         alarmManager.cancel(pendingIntent)
-    }
-
-    fun toggleTheme(isDark: Boolean, context: Context) {
-        viewModelScope.launch {
-            context.dataStore.edit { preferences ->
-                preferences[THEME_KEY] = isDark
-            }
-            _isDarkTheme.value = isDark
-        }
-    }
-
-    fun loadThemeState(context: Context) {
-        viewModelScope.launch {
-            context.dataStore.data
-                .map { preferences -> preferences[THEME_KEY] }
-                .collect { isDark ->
-                    _isDarkTheme.value = isDark
-                        ?: isSystemInDarkMode(context)
-                }
-        }
     }
 
     private fun isSystemInDarkMode(context: Context): Boolean {
