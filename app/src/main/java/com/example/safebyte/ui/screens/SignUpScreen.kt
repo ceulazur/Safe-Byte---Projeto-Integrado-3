@@ -35,7 +35,7 @@ import com.example.safebyte.ui.components.IconType
 import com.example.safebyte.ui.components.SBButtonPrimary
 import com.example.safebyte.ui.components.SBPasswordField
 import com.example.safebyte.ui.components.SBTextField
-import com.example.safebyte.ui.viewmodel.SignUpViewModel
+import com.example.safebyte.viewmodel.SignUpViewModel
 
 @Composable
 fun SignUpScreen(

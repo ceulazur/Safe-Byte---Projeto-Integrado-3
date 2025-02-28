@@ -1,4 +1,4 @@
-package com.example.safebyte.ui.viewmodel
+package com.example.safebyte.viewmodel
 
 import android.content.Context
 import android.net.Uri

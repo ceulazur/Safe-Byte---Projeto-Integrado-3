@@ -38,7 +38,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.safebyte.R
-import com.example.safebyte.ui.viewmodel.SettingsViewModel
+import com.example.safebyte.viewmodel.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,7 +46,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = viewModel(),
     onNavigateBack: () -> Unit,
     onNavigateMyAllergies: () -> Unit,
-    onNavigateFAQ: () -> Unit
+    onNavigateFAQ: () -> Unit,
 ) {
     val isDarkTheme by viewModel.isDarkTheme.collectAsState()
     val isNotificationEnabled by viewModel.isNotificationEnabled.collectAsState()

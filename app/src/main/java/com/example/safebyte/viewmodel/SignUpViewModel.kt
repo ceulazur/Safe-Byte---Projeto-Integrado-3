@@ -1,11 +1,12 @@
-package com.example.safebyte.ui.viewmodel
+package com.example.safebyte.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.safebyte.ui.viewmodel.validations.ValidateEmail
-import com.example.safebyte.ui.viewmodel.validations.ValidatePassword
-import com.example.safebyte.ui.viewmodel.validations.ValidateFullName
-import com.example.safebyte.ui.viewmodel.validations.ValidatePasswordMatch
+import com.example.safebyte.viewmodel.validations.ValidateEmail
+import com.example.safebyte.viewmodel.validations.ValidateFullName
+import com.example.safebyte.viewmodel.validations.ValidatePassword
+import com.example.safebyte.viewmodel.validations.ValidatePasswordMatch
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,15 +27,17 @@ data class SignUpUiState(
     val fullNameError: String? = null,
     val emailError: String? = null,
     val passwordError: String? = null,
-    val confirmPasswordError: String? = null
+    val confirmPasswordError: String? = null,
 )
 
 class SignUpViewModel(
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
     private val validateFullName: ValidateFullName = ValidateFullName(),
     private val validateEmail: ValidateEmail = ValidateEmail(),
     private val validatePassword: ValidatePassword = ValidatePassword(),
-    private val validatePasswordMatch: ValidatePasswordMatch = ValidatePasswordMatch()
+    private val validatePasswordMatch: ValidatePasswordMatch = ValidatePasswordMatch(),
 ) : ViewModel() {
+
     private val _uiState = MutableStateFlow(SignUpUiState())
     val uiState: StateFlow<SignUpUiState> get() = _uiState
 
@@ -99,42 +102,44 @@ class SignUpViewModel(
     }
 
     fun signUp(onSuccess: () -> Unit) {
-        if(!validateForm()) return
+        if (!validateForm()) return
+
+        _uiState.value = _uiState.value.copy(isLoading = true)
 
         viewModelScope.launch {
-            try {
-                _uiState.value = _uiState.value.copy(isLoading = true)
-                // Simulate API call
-                kotlinx.coroutines.delay(2000)
+            auth.createUserWithEmailAndPassword(_uiState.value.email, _uiState.value.password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        _uiState.value = _uiState.value.copy(
+                            isRegistered = true,
+                            isLoading = false
+                        )
 
-                _uiState.value = _uiState.value.copy(
-                    isRegistered = true,
-                    isLoading = false
-                )
+                        viewModelScope.launch {
+                            validateEventChannel.send(ValidationEvent.Success)
+                        }
 
-                validateEventChannel.send(ValidationEvent.Success)
+                        onSuccess()
+                    } else {
+                        _uiState.value = _uiState.value.copy(isLoading = false)
 
-                onSuccess()
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(isLoading = false)
+                        val errorMessage = when (task.exception?.message) {
+                            "The email address is already in use by another account." -> "Este email já está cadastrado!"
+                            "The email address is badly formatted." -> "Formato de email inválido!"
+                            "The given password is invalid." -> "A senha precisa ter pelo menos 6 caracteres!"
+                            else -> "Erro ao criar conta. Tente novamente!"
+                        }
 
-                when {
-                    e.message?.contains("400") == true -> {
-                        validateEventChannel.send(ValidationEvent.Error("Dados inválidos!"))
-                    }
-                    e.message?.contains("409") == true -> {
-                        validateEventChannel.send(ValidationEvent.Error("Email já cadastrado!"))
-                    }
-                    else -> {
-                        validateEventChannel.send(ValidationEvent.Error("Não foi possível realizar o cadastro!"))
+                        viewModelScope.launch {
+                            validateEventChannel.send(ValidationEvent.Error(errorMessage))
+                        }
                     }
                 }
-            }
         }
     }
 
     sealed class ValidationEvent {
-        data object Success: ValidationEvent()
-        data class Error(val message: String): ValidationEvent()
+        data object Success : ValidationEvent()
+        data class Error(val message: String) : ValidationEvent()
     }
 }

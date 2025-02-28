@@ -1,4 +1,4 @@
-package com.example.safebyte.ui.viewmodel
+package com.example.safebyte.viewmodel
 
 import android.app.AlarmManager
 import android.app.Application
@@ -9,21 +9,18 @@ import android.content.res.Configuration
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.test.core.app.ApplicationProvider
 import com.example.safebyte.data.local.AppDatabase
 import com.example.safebyte.data.repository.SettingsRepository
 import com.example.safebyte.receiver.NotificationReceiver
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.util.Calendar
-import kotlinx.coroutines.flow.firstOrNull
 
-class SettingsViewModel(application: Application): AndroidViewModel(application) {
+class SettingsViewModel(application: Application) : AndroidViewModel(application) {
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
 
@@ -51,12 +48,13 @@ class SettingsViewModel(application: Application): AndroidViewModel(application)
                 val repository = getRepository(context)
                 val currentSettings = repository.getSettings().firstOrNull()
 
-                val newSettings = currentSettings?.copy(animationsEnabled = enabled) ?: com.example.safebyte.data.local.Settings(
-                    id = 0,
-                    animationsEnabled = enabled,
-                    darkThemeEnabled = _isDarkTheme.value,
-                    notificationsEnabled = _isNotificationEnabled.value
-                )
+                val newSettings = currentSettings?.copy(animationsEnabled = enabled)
+                    ?: com.example.safebyte.data.local.Settings(
+                        id = 0,
+                        animationsEnabled = enabled,
+                        darkThemeEnabled = _isDarkTheme.value,
+                        notificationsEnabled = _isNotificationEnabled.value
+                    )
 
                 repository.insertSettings(newSettings)
                 _isAnimationsEnabled.value = enabled
@@ -84,12 +82,13 @@ class SettingsViewModel(application: Application): AndroidViewModel(application)
                 val repository = getRepository(context)
                 val currentSettings = repository.getSettings().firstOrNull()
 
-                val newSettings = currentSettings?.copy(notificationsEnabled = enabled) ?: com.example.safebyte.data.local.Settings(
-                    id = 0,
-                    notificationsEnabled = enabled,
-                    darkThemeEnabled = _isDarkTheme.value,
-                    animationsEnabled = _isAnimationsEnabled.value
-                )
+                val newSettings = currentSettings?.copy(notificationsEnabled = enabled)
+                    ?: com.example.safebyte.data.local.Settings(
+                        id = 0,
+                        notificationsEnabled = enabled,
+                        darkThemeEnabled = _isDarkTheme.value,
+                        animationsEnabled = _isAnimationsEnabled.value
+                    )
 
                 repository.insertSettings(newSettings)
                 _isNotificationEnabled.value = enabled
@@ -111,12 +110,13 @@ class SettingsViewModel(application: Application): AndroidViewModel(application)
                 val repository = getRepository(context)
                 val currentSettings = repository.getSettings().firstOrNull()
 
-                val newSettings = currentSettings?.copy(darkThemeEnabled = isDark) ?: com.example.safebyte.data.local.Settings(
-                    id = 0,
-                    darkThemeEnabled = isDark,
-                    notificationsEnabled = _isNotificationEnabled.value,
-                    animationsEnabled = _isAnimationsEnabled.value
-                )
+                val newSettings = currentSettings?.copy(darkThemeEnabled = isDark)
+                    ?: com.example.safebyte.data.local.Settings(
+                        id = 0,
+                        darkThemeEnabled = isDark,
+                        notificationsEnabled = _isNotificationEnabled.value,
+                        animationsEnabled = _isAnimationsEnabled.value
+                    )
 
                 repository.insertSettings(newSettings)
                 _isDarkTheme.value = isDark

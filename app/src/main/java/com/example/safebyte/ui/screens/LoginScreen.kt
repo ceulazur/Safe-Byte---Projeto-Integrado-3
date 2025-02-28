@@ -1,24 +1,16 @@
 package com.example.safebyte.ui.screens
 
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,43 +19,63 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.safebyte.R
-import com.example.safebyte.ui.components.IconType
-import com.example.safebyte.ui.components.SBButtonPrimary
-import com.example.safebyte.ui.components.SBPasswordField
-import com.example.safebyte.ui.components.SBTextField
-import com.example.safebyte.ui.viewmodel.AuthViewModel
-import com.example.safebyte.ui.viewmodel.LoginViewModel
+import com.example.safebyte.data.repository.AuthRepository
+import com.example.safebyte.ui.components.*
+import com.example.safebyte.viewmodel.LoginViewModel
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun LoginScreen(
-    authViewModel: AuthViewModel,
-    navController: NavHostController,
+    navController: NavHostController
 ) {
-    val viewModel = LoginViewModel()
-    val uiState = viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
+    val authRepository = remember { AuthRepository(FirebaseAuth.getInstance()) }
+    val viewModel = remember { LoginViewModel(authRepository) }
+
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)
+            val idToken = account?.idToken
+            if (idToken != null) {
+                viewModel.loginWithGoogle(idToken)
+            } else {
+                Toast.makeText(context, "Erro ao obter ID Token", Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: ApiException) {
+            Log.e("LoginScreen", "Erro ao autenticar com Google", e)
+            Toast.makeText(context, "Erro ao autenticar com Google: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    val googleSignInClient = remember {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken("1072159158094-i5jjb7ocq2gm716uq0mdob9d2ik77eda.apps.googleusercontent.com")
+            .requestEmail()
+            .build()
+        GoogleSignIn.getClient(context, gso)
+    }
+
+    val uiState = viewModel.uiState.collectAsState()
+
     LaunchedEffect(key1 = true) {
-        viewModel.validateEvents.collect { event ->
+        viewModel.events.collect { event ->
             when (event) {
                 is LoginViewModel.ValidationEvent.Success -> {
-                    Toast.makeText(
-                        context,
-                        "Login realizado com sucesso",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(context, "Login realizado com sucesso", Toast.LENGTH_SHORT).show()
+                    navController.navigate("home") {
+                        popUpTo("login") { inclusive = true }
+                    }
                 }
-
                 is LoginViewModel.ValidationEvent.Error -> {
-                    Toast.makeText(
-                        context,
-                        event.message,
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(context, event.message ?: "Erro desconhecido", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -89,6 +101,7 @@ fun LoginScreen(
                         .size(48.dp)
                         .clip(RoundedCornerShape(16.dp))
                 )
+
                 Text(
                     text = stringResource(R.string.safe_byte),
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
@@ -109,9 +122,7 @@ fun LoginScreen(
                         placeholder = stringResource(R.string.email),
                         modifier = Modifier,
                         value = uiState.value.email,
-                        onTextChange = {
-                            viewModel.updateEmail(it)
-                        }
+                        onTextChange = { viewModel.updateEmail(it) }
                     )
 
                     if (uiState.value.emailError != null) {
@@ -124,12 +135,10 @@ fun LoginScreen(
                     }
 
                     SBPasswordField(
-                        placeholder = "Password",
+                        placeholder = "Senha",
                         value = uiState.value.password,
                         modifier = Modifier,
-                        onTextChange = {
-                            viewModel.updatePassword(it)
-                        }
+                        onTextChange = { viewModel.updatePassword(it) }
                     )
 
                     if (uiState.value.passwordError != null) {
@@ -142,37 +151,28 @@ fun LoginScreen(
 
                     SBButtonPrimary(
                         label = "Entrar",
-                        onClick = {
-                            viewModel.login(onSuccess = {
-                                authViewModel.login()
-                                navController.navigate("home") {
-                                    popUpTo("login") { inclusive = true }
-                                }
-                            })
-                        },
+                        onClick = { viewModel.login() },
                         isLoading = uiState.value.isLoading
                     )
                 }
 
                 Text("Ou entre com")
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_logo_google),
                         contentDescription = "Google",
-                        modifier = Modifier.size(28.dp),
+                        modifier = Modifier
+                            .size(28.dp)
+                            .clickable { launcher.launch(googleSignInClient.signInIntent) },
                         contentScale = ContentScale.Fit
                     )
-
                     Image(
                         painter = painterResource(id = R.drawable.ic_logo_linkedin),
                         contentDescription = "Linkedin",
                         modifier = Modifier.size(28.dp),
                         contentScale = ContentScale.Fit
                     )
-
                     Image(
                         painter = painterResource(id = R.drawable.ic_logo_ig),
                         contentDescription = "Instagram",
@@ -185,7 +185,7 @@ fun LoginScreen(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text("Primeria vez?")
+                    Text("Primeira vez?")
                     Text(
                         text = "Criar conta",
                         fontWeight = FontWeight.Bold,
@@ -193,26 +193,8 @@ fun LoginScreen(
                             navController.navigate("sign_up")
                         }
                     )
-
                 }
             }
         }
-
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    val navController = NavHostController(LocalContext.current)
-
-    LoginScreen(
-        authViewModel = AuthViewModel(),
-        navController = navController
-    )
-
-    LoginScreen(
-        authViewModel = AuthViewModel(),
-        navController = navController
-    )
 }
