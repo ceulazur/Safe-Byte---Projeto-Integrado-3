@@ -36,8 +36,9 @@ import com.example.safebyte.ui.screens.RestaurantSearchScreen
 import com.example.safebyte.ui.screens.SettingsScreen
 import com.example.safebyte.ui.screens.SignUpScreen
 import com.example.safebyte.ui.screens.User
-import com.example.safebyte.ui.viewmodel.AuthViewModel
-import com.example.safebyte.ui.viewmodel.SettingsViewModel
+import com.example.safebyte.viewmodel.AuthViewModel
+import com.example.safebyte.viewmodel.SettingsViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -45,6 +46,7 @@ fun NavGraph(
     navController: NavHostController,
     authViewModel: AuthViewModel,
     settingsViewModel: SettingsViewModel,
+    auth: FirebaseAuth
 ) {
     val isAnimationsEnabled by settingsViewModel.isAnimationsEnabled.collectAsState()
     val context = navController.context
@@ -70,7 +72,6 @@ fun NavGraph(
     ) {
         composable("login") {
             LoginScreen(
-                authViewModel = authViewModel,
                 navController = navController
             )
         }
@@ -125,7 +126,7 @@ fun NavGraph(
                 onSignUpSuccess = {
                     navController.navigate("login")
                 },
-                navigateController = navController
+                navigateController = navController,
             )
         }
 

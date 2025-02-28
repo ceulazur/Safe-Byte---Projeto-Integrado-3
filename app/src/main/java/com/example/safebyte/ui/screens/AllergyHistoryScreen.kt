@@ -47,8 +47,8 @@ import com.example.safebyte.ui.components.SBButtonPrimary
 import com.example.safebyte.ui.components.SBTextField
 import com.example.safebyte.ui.components.SecondaryTopBar
 import com.example.safebyte.ui.components.Timeline
-import com.example.safebyte.ui.viewmodel.AllergyHistoryViewModel
-import com.example.safebyte.ui.viewmodel.UploadState
+import com.example.safebyte.viewmodel.AllergyHistoryViewModel
+import com.example.safebyte.viewmodel.UploadState
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date

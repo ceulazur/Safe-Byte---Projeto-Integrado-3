@@ -1,4 +1,4 @@
-package com.example.safebyte.ui.viewmodel
+package com.example.safebyte.viewmodel
 
 import android.net.Uri
 import com.google.firebase.storage.FirebaseStorage

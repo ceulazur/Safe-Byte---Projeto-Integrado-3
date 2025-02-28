@@ -19,5 +19,6 @@ buildscript {
     dependencies {
         classpath(libs.google.services.v4310)
         classpath(libs.kotlin.serialization)
+        classpath("com.google.gms:google-services:4.3.10")
     }
 }

@@ -24,16 +24,23 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.safebyte.navigation.NavGraph
 import com.example.safebyte.ui.theme.SafeByteTheme
-import com.example.safebyte.ui.viewmodel.SettingsViewModel
+import com.example.safebyte.viewmodel.SettingsViewModel
+import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 
 class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
+    private lateinit var auth: FirebaseAuth
 
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         try {
-            FirebaseApp.initializeApp(this)
+            if (FirebaseApp.getApps(this).isEmpty()) {
+                FirebaseApp.initializeApp(this)
+            }
+            auth = Firebase.auth
             Log.d("SafeByteApplication", "Firebase initialized successfully")
         } catch (e: Exception) {
             Log.e("SafeByteApplication", "Error initializing Firebase: ${e.message}")
@@ -75,11 +82,14 @@ class MainActivity : ComponentActivity() {
 
         createNotificationChannel()
 
-        NavGraph(
-            authViewModel = viewModel(),
-            navController = navController,
-            settingsViewModel = settingsViewModel
-        )
+        auth.let {
+            NavGraph(
+                authViewModel = viewModel(),
+                navController = navController,
+                settingsViewModel = settingsViewModel,
+                auth = it
+            )
+        }
 
     }
 

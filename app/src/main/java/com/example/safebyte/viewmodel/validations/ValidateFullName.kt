@@ -1,7 +1,5 @@
 package com.example.safebyte.viewmodel.validations
 
-import com.example.safebyte.ui.viewmodel.validations.ValidationResult
-
 class ValidateFullName {
     fun execute(fullName: String): ValidationResult {
         if (fullName.isBlank()) {
